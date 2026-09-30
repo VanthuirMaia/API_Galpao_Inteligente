@@ -13,5 +13,6 @@ def criar_pool(url: str) -> ConnectionPool:
         max_size=5,
         timeout=5,
         open=False,
-        kwargs={"autocommit": True, "row_factory": dict_row},
+        # TimeZone UTC: os datetimes saem sempre em UTC
+        kwargs={"autocommit": True, "row_factory": dict_row, "options": "-c TimeZone=UTC"},
     )

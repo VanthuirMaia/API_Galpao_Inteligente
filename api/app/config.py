@@ -21,6 +21,11 @@ def jwt_expira_min() -> int:
     return int(os.environ.get("JWT_EXPIRA_MIN", "480"))
 
 
+def online_limite_s() -> int:
+    """Segundos sem receber leitura para o dispositivo deixar de ser "online"."""
+    return int(os.environ.get("ONLINE_LIMITE_S", "300"))
+
+
 def cors_origins() -> list[str]:
     """Lista separada por vírgula; vazio = sem CORS."""
     bruto = os.environ.get("CORS_ORIGINS", "")
