@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+psycopg[binary]>=3.2
+psycopg-pool
+pyjwt
+pwdlib[argon2]
+# exigido pelo OAuth2PasswordRequestForm (login por formulário)
+python-multipart

@@ -16,17 +16,17 @@ O PostgreSQL roda direto no host (localhost:5432) e não é alterado pelo projet
    ```
    git clone <URL_DO_REPOSITORIO> galpao-api && cd galpao-api
    ```
-2. Criar o banco `galpao` e aplicar `001` e `002` (como `postgres`):
+2. Criar o banco `galpao` e aplicar `001`, `002` e `003` (como `postgres`; se a VPS já tem a 001 e a 002 aplicadas, rode só `sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao -f db/003_usuarios_api.sql`):
    ```
-   sudo -u postgres createdb galpao && cat db/001_init.sql db/002_permissoes.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
+   sudo -u postgres createdb galpao && cat db/001_init.sql db/002_permissoes.sql db/003_usuarios_api.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
    ```
-3. Definir as senhas das duas roles (hex, para não quebrar a URL do banco) e anotá-las:
+3. Definir as senhas das roles `galpao_ingestor` e `galpao_api` (hex, para não quebrar a URL do banco) e anotá-las:
    ```
-   for r in galpao_ingestor galpao_leitura; do p=$(openssl rand -hex 32); sudo -u postgres psql -d galpao -qc "ALTER ROLE $r PASSWORD '$p'" && echo "$r: $p"; done
+   for r in galpao_ingestor galpao_api; do p=$(openssl rand -hex 32); sudo -u postgres psql -d galpao -qc "ALTER ROLE $r PASSWORD '$p'" && echo "$r: $p"; done
    ```
-4. Verificar as permissões (roda num container Python, sem instalar nada no host; troque `SENHA_ING` e `SENHA_LEI`):
+4. Verificar as permissões (roda num container Python, sem instalar nada no host; troque `SENHA_ING` e `SENHA_API`):
    ```
-   docker run --rm --network host -v "$PWD:/app" -w /app python:3.12-slim sh -c "pip install -q 'psycopg[binary]' && python scripts/verificar_permissoes.py --ingestor postgresql://galpao_ingestor:SENHA_ING@localhost:5432/galpao --leitura postgresql://galpao_leitura:SENHA_LEI@localhost:5432/galpao"
+   docker run --rm --network host -v "$PWD:/app" -w /app python:3.12-slim sh -c "pip install -q 'psycopg[binary]' && python scripts/verificar_permissoes.py --ingestor postgresql://galpao_ingestor:SENHA_ING@localhost:5432/galpao --api postgresql://galpao_api:SENHA_API@localhost:5432/galpao"
    ```
 5. Limpar os registros de teste deixados pela verificação:
    ```

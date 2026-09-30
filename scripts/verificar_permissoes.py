@@ -1,6 +1,6 @@
-"""Verifica as permissões das roles galpao_ingestor e galpao_leitura.
+"""Verifica as permissões das roles galpao_ingestor e galpao_api.
 
-Uso: python scripts/verificar_permissoes.py --ingestor URL --leitura URL
+Uso: python scripts/verificar_permissoes.py --ingestor URL --api URL
 Sai com código != 0 se algum item falhar.
 """
 import argparse
@@ -45,7 +45,7 @@ def payload(device: str, ts: int) -> bytes:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ingestor", required=True, help="URL do Postgres com a role galpao_ingestor")
-    ap.add_argument("--leitura", required=True, help="URL do Postgres com a role galpao_leitura")
+    ap.add_argument("--api", required=True, help="URL do Postgres com a role galpao_api")
     args = ap.parse_args()
 
     agora = datetime.now(timezone.utc)
@@ -63,8 +63,8 @@ def main() -> None:
         item("esp99 -> rejeitada:device_desconhecido", r == "rejeitada:device_desconhecido", r)
         deve_ser_negado(conn, "DELETE em galpao.leituras negado", "DELETE FROM galpao.leituras")
 
-    print("== galpao_leitura")
-    with psycopg.connect(args.leitura, autocommit=True) as conn:
+    print("== galpao_api")
+    with psycopg.connect(args.api, autocommit=True) as conn:
         try:
             n = conn.execute("SELECT count(*) FROM galpao.leituras").fetchone()[0]
             item("SELECT em galpao.leituras", True, f"{n} linhas")
@@ -75,6 +75,16 @@ def main() -> None:
             "INSERT INTO galpao.leituras (device_id, ts, ts_origem, t_int, ur_int, t_globo, tpo, itgu, payload) "
             "VALUES ('esp01', now(), 'esp', 1, 1, 1, 1, 1, '{}')",
         )
+        deve_ser_negado(conn, "DELETE em galpao.usuarios negado", "DELETE FROM galpao.usuarios")
+        # UPDATE em dispositivos: altera e restaura o mesmo valor
+        try:
+            orig = conn.execute("SELECT descricao FROM galpao.dispositivos WHERE id = 'esp01'").fetchone()[0]
+            q = "UPDATE galpao.dispositivos SET descricao = %s WHERE id = 'esp01'"
+            n1 = conn.execute(q, ((orig or "") + " ",)).rowcount
+            n2 = conn.execute(q, (orig,)).rowcount
+            item("UPDATE em galpao.dispositivos (valor restaurado)", n1 == 1 and n2 == 1)
+        except psycopg.Error as e:
+            item("UPDATE em galpao.dispositivos (valor restaurado)", False, str(e))
 
     print()
     print("Ficaram registros de teste (esp01 em galpao.leituras, esp99 em galpao.erros_ingestao).")
