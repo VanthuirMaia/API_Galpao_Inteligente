@@ -17,6 +17,15 @@ function destino() {
   return caminhoInternoSeguro(volta) ? volta : "index.html";
 }
 
+// mensagens que outras telas podem pedir por ?msg=codigo (só códigos conhecidos, nunca texto da URL)
+const MENSAGENS = { "senha-alterada": "Senha alterada. Entre novamente." };
+const codigoMsg = new URLSearchParams(location.search).get("msg");
+if (MENSAGENS[codigoMsg]) {
+  const info = document.getElementById("info");
+  info.textContent = MENSAGENS[codigoMsg];
+  info.hidden = false;
+}
+
 function mostrarErro(texto) {
   erro.textContent = texto;
   erro.hidden = !texto;

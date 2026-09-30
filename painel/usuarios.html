@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuários - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo" id="principal" data-estado="carregando">
+    <div class="barra-acoes">
+      <h1>Usuários</h1>
+      <button id="btn-novo" type="button" class="botao-simples">Novo usuário</button>
+    </div>
+    <p id="aviso-ok" class="msg ok toast" role="status" hidden></p>
+    <p id="erro-pagina" class="msg erro" role="alert" hidden></p>
+    <p id="carregando" class="sub">Carregando…</p>
+    <section id="lista" class="grade-cards" aria-label="Usuários"></section>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+
+  <!-- novo usuário -->
+  <dialog id="dlg-novo" aria-labelledby="t-novo">
+    <h2 id="t-novo">Novo usuário</h2>
+    <form id="form-novo" novalidate>
+      <label for="n-nome">Nome</label>
+      <input id="n-nome" type="text" maxlength="120" autocomplete="off">
+      <label for="n-email">E-mail</label>
+      <input id="n-email" type="email" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <label for="n-perfil">Perfil</label>
+      <select id="n-perfil">
+        <option value="leitor">Leitor (só consulta)</option>
+        <option value="admin">Administrador (configura)</option>
+      </select>
+      <label for="n-senha">Senha inicial (mínimo 10 caracteres)</label>
+      <div class="duas-colunas">
+        <input id="n-senha" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <button id="gerar-senha" type="button" class="botao-simples claro">Gerar senha</button>
+      </div>
+      <p class="ajuda">Você poderá copiar a senha depois de criar o usuário. Ela é mostrada uma única vez.</p>
+      <p class="msg erro erro-dialogo" role="alert" hidden></p>
+      <div class="acoes-form">
+        <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>
+        <button type="submit" class="botao-simples">Criar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- editar usuário -->
+  <dialog id="dlg-editar" aria-labelledby="t-editar">
+    <h2 id="t-editar">Editar usuário</h2>
+    <form id="form-editar" novalidate>
+      <p class="sub" id="ed-email"></p>
+      <label for="ed-nome">Nome</label>
+      <input id="ed-nome" type="text" maxlength="120" autocomplete="off">
+      <label for="ed-perfil">Perfil</label>
+      <select id="ed-perfil">
+        <option value="leitor">Leitor (só consulta)</option>
+        <option value="admin">Administrador (configura)</option>
+      </select>
+      <label class="campo-check" for="ed-ativo"><input id="ed-ativo" type="checkbox"> Usuário ativo</label>
+      <button id="redefinir" type="button" class="botao-simples claro">Redefinir senha</button>
+      <p class="msg erro erro-dialogo" role="alert" hidden></p>
+      <div class="confirmacao" hidden>
+        <p class="confirmacao-texto"></p>
+        <div class="acoes">
+          <button type="button" class="botao-simples claro" data-voltar>Voltar</button>
+          <button type="button" class="botao-simples perigo" data-confirmar>Confirmar</button>
+        </div>
+      </div>
+      <div class="acoes-form">
+        <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>
+        <button type="submit" class="botao-simples">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- senha gerada: mostrada uma única vez -->
+  <dialog id="dlg-senha" aria-labelledby="t-senha">
+    <h2 id="t-senha">Senha do usuário</h2>
+    <p id="senha-usuario" class="sub"></p>
+    <p id="senha-gerada" class="senha-gerada"></p>
+    <button id="copiar-senha" type="button" class="botao-simples claro pequeno">Copiar senha</button>
+    <p class="aviso-forte">Anote e entregue ao usuário. Esta senha não será exibida de novo.</p>
+    <p id="senha-aviso-sessao" class="ajuda" hidden>Como você redefiniu a sua própria senha, ao fechar você precisará entrar de novo.</p>
+    <div class="acoes-form">
+      <button id="fechar-senha" type="button" class="botao-simples">Fechar</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/usuarios.js"></script>
+</body>
+</html>

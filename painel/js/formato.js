@@ -131,3 +131,25 @@ export function dispositivoDoTopico(topico) {
   const m = /^galpao\/([^/]+)\/leituras$/.exec(topico || "");
   return m ? m[1] : topico || "—";
 }
+
+// ---------- datas de calendário (alojamento) ----------
+const fmtDataISO = new Intl.DateTimeFormat("sv-SE", { timeZone: FUSO, year: "numeric", month: "2-digit", day: "2-digit" });
+
+/** Hoje em Recife, no formato AAAA-MM-DD (o mesmo do <input type="date">). */
+export function hojeRecifeISO() {
+  return fmtDataISO.format(new Date());
+}
+
+/** "2026-09-10" -> "10/09/2026" (sem passar por Date, para não deslocar o dia por fuso). */
+export function dataCurta(iso) {
+  if (!iso) return "—";
+  const [a, m, d] = iso.split("-");
+  return `${d}/${m}/${a}`;
+}
+
+/** Idade em dias de um lote alojado em `iso` (AAAA-MM-DD), hoje em Recife. O dia do alojamento é a idade 0. */
+export function idadeEmDias(iso) {
+  const [a, m, d] = iso.split("-").map(Number);
+  const [ha, hm, hd] = hojeRecifeISO().split("-").map(Number);
+  return Math.round((Date.UTC(ha, hm - 1, hd) - Date.UTC(a, m - 1, d)) / 86400000);
+}

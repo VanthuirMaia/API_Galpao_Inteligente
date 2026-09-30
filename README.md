@@ -97,4 +97,26 @@ Notas:
 - O login (`/api/auth/login`) tem limite de 5 tentativas por minuto por IP (rajada de 5), aplicado pelo Traefik.
 - A documentação interativa fica em `https://SEU_DOMINIO/api/docs`.
 
+## Deploy do painel na VPS
+
+O painel é um site estático servido por um container nginx, atrás do mesmo Traefik da API (rota `/`, prioridade abaixo da `/api`). Rode na raiz do repositório, depois de a API já estar no ar.
+
+1. Atualizar o código:
+   ```
+   git pull
+   ```
+2. Subir só o painel:
+   ```
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d painel
+   ```
+3. Testar no navegador (a tela de login deve abrir):
+   ```
+   curl -I https://SEU_DOMINIO/
+   ```
+
+Notas:
+- Como o painel é estático (sem build), uma atualização de HTML, CSS ou JS só precisa de `git pull`: os arquivos são montados no container. O navegador pode levar até 5 minutos para pegar `.css` e `.js` novos (cache curto); as páginas `.html` não ficam em cache.
+- `scripts/gerar_dados_dev.py` é SÓ para o banco de desenvolvimento e NUNCA deve rodar em produção. Ele tem uma trava: recusa qualquer `DATABASE_URL` que não aponte para localhost.
+- O painel depende do domínio definido em `DOMINIO` (veja "Deploy da API na VPS"); trocar de domínio não exige mudar nada no painel.
+
 Projeto desenvolvido no Espaço CRIA da ETEGEC com apoio da Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco (FACEPE), processo ARC-0572-1.03/26.

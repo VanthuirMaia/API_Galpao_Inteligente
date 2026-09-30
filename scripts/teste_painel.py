@@ -196,6 +196,341 @@ def testar_diagnostico(page) -> None:
     page.set_viewport_size({"width": 1280, "height": 900})
 
 
+# ---------------------------------------------------------------------------
+# Administração (etapa 14). Usa sufixos únicos por execução e desativa o que cria,
+# porque a API não apaga (desativa-se). Premissa: o admin principal é o único admin ativo.
+# ---------------------------------------------------------------------------
+
+def observar(pg) -> None:
+    pg.on("console", lambda m: console.append((m.type, m.text)))
+    pg.on("pageerror", lambda e: console.append(("pageerror", str(e))))
+
+
+def novo_contexto(navegador, largura: int = 1280):
+    contexto = navegador.new_context(viewport={"width": largura, "height": 900}, locale="pt-BR", timezone_id="America/Recife")
+    pg = contexto.new_page()
+    observar(pg)
+    return contexto, pg
+
+
+def esperar_dialogo_fechado(page, seletor: str) -> None:
+    page.locator(seletor).wait_for(state="hidden")
+
+
+def card_por_texto(page, texto: str):
+    return page.locator("article.card", has_text=texto)
+
+
+def testar_acesso_de_leitor(navegador) -> None:
+    print("--- admin: leitor bloqueado")
+    ctx, pg = novo_contexto(navegador)
+    entrar(pg, *LEITOR)
+    pg.wait_for_url(re.compile(r"/index\.html$"))
+    for pagina in ("dispositivos", "faixas", "usuarios"):
+        pg.goto(f"{BASE}/{pagina}.html")
+        pg.wait_for_url(re.compile(r"/index\.html$"))
+        item(f"leitor em {pagina}.html é levado para index.html", True)
+    ctx.close()
+
+
+def testar_dispositivos(page, sufixo: str) -> str:
+    print("--- admin: dispositivos")
+    device = f"tst{sufixo}"
+    page.goto(f"{BASE}/dispositivos.html")
+    page.wait_for_selector("article.card[data-id='esp01']")
+
+    page.click("#btn-novo")
+    page.fill("#novo-id", "ESP/1")
+    page.click("#form-novo button[type=submit]")
+    item("id inválido é barrado no front", "Id inválido" in page.inner_text("#dlg-novo .erro-dialogo"))
+    item("id inválido não cria cartão", page.locator("article.card[data-id='ESP/1']").count() == 0)
+
+    page.fill("#novo-id", device)
+    page.select_option("#novo-ambiente", "modelo")
+    page.fill("#novo-descricao", "Teste do painel")
+    page.click("#form-novo button[type=submit]")
+    page.wait_for_selector("#dlg-criado[open]")
+    item("criação mostra o aviso da API", "cadastre o usuário MQTT" in page.inner_text("#criado-aviso"))
+    item("criação mostra o comando pronto", page.inner_text("#criado-comando") == f"sh scripts/criar_usuario_mqtt.sh {device} <senha>")
+    page.click("#copiar-comando")
+    page.wait_for_function("() => ['Copiado!', 'Selecione e copie'].includes(document.getElementById('copiar-comando').textContent)")
+    item("botão Copiar responde", True)
+    page.click("#dlg-criado [data-fechar]")
+    page.wait_for_selector(f"article.card[data-id='{device}']")
+    item("dispositivo novo aparece na lista", "Teste do painel" in card_por_texto(page, device).inner_text())
+
+    def editar():
+        page.click(f"article.card[data-id='{device}'] [data-acao='editar']")
+        page.wait_for_selector("#dlg-editar[open]")
+
+    # data de alojamento 10 dias atrás: idade, faixa pela idade e prévia
+    data = (datetime.now(RECIFE) - timedelta(days=10)).date().isoformat()
+    editar()
+    page.fill("#ed-data", data)
+    item("prévia mostra a idade do lote", "10 dias" in page.inner_text("#ed-previa"), page.inner_text("#ed-previa"))
+    page.click("#form-editar button[type=submit]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    page.wait_for_selector("#aviso-ok:not([hidden])")
+    texto = card_por_texto(page, device).inner_text()
+    item("lista mostra idade e faixa pela idade", "10 dias" in texto and "EXEMPLO - Semana 2" in texto and "pela idade" in texto, re.sub(r"\s+", " ", texto)[:150])
+
+    # faixa manual
+    editar()
+    page.select_option("#ed-faixa", label="EXEMPLO - Semana 1 (0 a 7 dias)")
+    page.click("#form-editar button[type=submit]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    page.wait_for_function(f"() => document.querySelector(\"article.card[data-id='{device}']\").innerText.includes('escolhida à mão')")
+    item("faixa manual vale acima da idade", "EXEMPLO - Semana 1" in card_por_texto(page, device).inner_text())
+
+    # data futura é barrada no front
+    editar()
+    amanha = (datetime.now(RECIFE) + timedelta(days=1)).date().isoformat()
+    page.fill("#ed-data", amanha)
+    page.click("#form-editar button[type=submit]")
+    item("data de alojamento futura é barrada", "futura" in page.inner_text("#dlg-editar .erro-dialogo"))
+    page.click("#dlg-editar .acoes-form [data-fechar]")
+
+    # encerrar lote, com confirmação
+    editar()
+    page.click("#encerrar-lote")
+    page.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    item("encerrar lote pede confirmação", "Encerrar o lote" in page.inner_text("#dlg-editar .confirmacao-texto"))
+    page.click("#dlg-editar [data-confirmar]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    page.wait_for_function(f"() => document.querySelector(\"article.card[data-id='{device}']\").innerText.includes('lote não informado')")
+    item("lote encerrado volta a 'lote não informado'", True)
+
+    # desativar com confirmação
+    editar()
+    page.uncheck("#ed-ativo")
+    page.click("#form-editar button[type=submit]")
+    page.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    item("desativar explica o prazo de 5 minutos", "5 minutos" in page.inner_text("#dlg-editar .confirmacao-texto"))
+    page.click("#dlg-editar [data-confirmar]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    page.wait_for_function(f"() => document.querySelector(\"article.card[data-id='{device}']\").innerText.includes('Inativo')")
+    item("dispositivo desativado aparece como Inativo", True)
+    page.screenshot(path=str(CAPTURAS / "dispositivos_1280.png"), full_page=True)
+    return device
+
+
+def testar_faixas(page, sufixo: str, device: str) -> None:
+    print("--- admin: faixas")
+    nome = f"Teste {sufixo}"
+    page.goto(f"{BASE}/faixas.html")
+    page.wait_for_selector("article.card")
+    item("faixas: cobertura completa das faixas de exemplo", "Todas as idades de 0 a 21" in page.inner_text("#cobertura"), page.inner_text("#cobertura"))
+    zonas = page.locator("article.card .regua .zona")
+    item("faixas: régua com 5 zonas por faixa", zonas.count() >= 15, f"{zonas.count()} zonas")
+    peso = page.evaluate("getComputedStyle(document.querySelector('article.card .regua .zona:nth-child(2)')).flexGrow")
+    item("faixas: tamanho da zona vem de --peso (CSSOM)", float(peso) > 0 and float(peso) != 1.0, f"flex-grow={peso}")
+
+    def preencher(nome_, ini, fim, cmin, mmin, mmax, cmax):
+        page.fill("#f-nome", nome_)
+        for campo, valor in (("ini", ini), ("fim", fim), ("cmin", cmin), ("mmin", mmin), ("mmax", mmax), ("cmax", cmax)):
+            page.fill(f"#f-{campo}", str(valor))
+
+    # limites fora de ordem barrados no front
+    page.click("#btn-nova")
+    preencher(nome, 25, 30, 70, 65, 75, 80)
+    page.click("#form-faixa button[type=submit]")
+    item("limites fora de ordem são barrados no front", "crítico mínimo < conforto mínimo" in page.inner_text("#dlg-faixa .erro-dialogo"))
+    preencher(nome, 30, 25, 60, 65, 75, 80)
+    page.click("#form-faixa button[type=submit]")
+    item("idade fim < início é barrada no front", "idade fim" in page.inner_text("#dlg-faixa .erro-dialogo"))
+
+    # criar com lacuna (25 a 30; as idades 22 a 24 ficam sem faixa)
+    preencher(nome, 25, 30, 60, 65, 75, 80)
+    page.click("#form-faixa button[type=submit]")
+    esperar_dialogo_fechado(page, "#dlg-faixa")
+    page.wait_for_selector(f"article.card:has-text('{nome}')")
+    item("faixa criada aparece na lista", True)
+    item("cobertura mostra a lacuna 22 a 24", "idades 22 a 24" in page.inner_text("#cobertura"), page.inner_text("#cobertura"))
+
+    # sobreposição: 409 da API no formulário
+    page.click("#btn-nova")
+    preencher(f"{nome} B", 28, 32, 60, 65, 75, 80)
+    page.click("#form-faixa button[type=submit]")
+    page.wait_for_function("() => !document.querySelector('#dlg-faixa .erro-dialogo').hidden")
+    item("sobreposição mostra o 409 no formulário", "sobrepõe" in page.inner_text("#dlg-faixa .erro-dialogo"), page.inner_text("#dlg-faixa .erro-dialogo"))
+    page.click("#dlg-faixa .acoes-form [data-fechar]")
+
+    # desativar faixa em uso manual: 409 com o id do dispositivo
+    card_por_texto(page, "EXEMPLO - Semana 1").locator("[data-acao='alternar']").click()
+    page.wait_for_selector("#dlg-confirma[open]")
+    page.click("#confirma-ok")
+    page.wait_for_function("() => !document.querySelector('#dlg-confirma .erro-dialogo').hidden")
+    msg = page.inner_text("#dlg-confirma .erro-dialogo")
+    item("desativar faixa em uso manual mostra 409 com o id do dispositivo", device in msg, msg[:140])
+    page.click("#dlg-confirma .acoes-form [data-fechar]")
+
+    # limpeza: desativa a faixa de teste
+    card_por_texto(page, nome).locator("[data-acao='alternar']").click()
+    page.wait_for_selector("#dlg-confirma[open]")
+    page.click("#confirma-ok")
+    esperar_dialogo_fechado(page, "#dlg-confirma")
+    page.wait_for_function(f"() => [...document.querySelectorAll('article.card')].some(c => c.innerText.includes('{nome}') && c.innerText.includes('Inativa'))")
+    item("faixa de teste desativada (limpeza)", True)
+    page.screenshot(path=str(CAPTURAS / "faixas_1280.png"), full_page=True)
+
+
+SENHA_GERADA = r"[A-HJ-NP-Za-km-z2-9]{14}"
+
+
+def criar_usuario(page, nome: str, email: str, perfil: str) -> str:
+    """Cria pelo painel com senha gerada e devolve a senha (mostrada uma única vez)."""
+    page.click("#btn-novo")
+    page.fill("#n-nome", nome)
+    page.fill("#n-email", email)
+    page.select_option("#n-perfil", perfil)
+    page.click("#form-novo button[type=submit]")
+    item("usuário: senha curta ou vazia é barrada no front", "pelo menos 10" in page.inner_text("#dlg-novo .erro-dialogo"))
+    page.click("#gerar-senha")
+    senha = page.input_value("#n-senha")
+    item("senha gerada: 14 caracteres sem ambíguos", re.fullmatch(SENHA_GERADA, senha) is not None, senha)
+    page.click("#form-novo button[type=submit]")
+    page.wait_for_selector("#dlg-senha[open]")
+    item("senha aparece uma vez para copiar", page.inner_text("#senha-gerada") == senha and "não será exibida de novo" in page.inner_text("#dlg-senha"))
+    page.click("#copiar-senha")
+    page.wait_for_function("() => ['Copiado!', 'Selecione e copie'].includes(document.getElementById('copiar-senha').textContent)")
+    page.click("#fechar-senha")
+    item("ao fechar, a senha some da tela", page.inner_text("#senha-gerada") == "")
+    page.wait_for_selector(f"article.card[data-email='{email}']")
+    return senha
+
+
+def cartao_usuario(page, email: str):
+    return page.locator(f"article.card[data-email='{email}']")
+
+
+def testar_usuarios(navegador, page, sufixo: str) -> None:
+    print("--- admin: usuários")
+    page.goto(f"{BASE}/usuarios.html")
+    page.wait_for_selector("article.card")
+    item("lista marca a própria conta com '(você)'", "(você)" in cartao_usuario(page, ADMIN[0]).inner_text())
+
+    # leitor criado com senha gerada, que consegue logar
+    email_leitor = f"leitor.{sufixo}@teste.com"
+    senha_leitor = criar_usuario(page, f"Leitor Teste {sufixo}", email_leitor, "leitor")
+    ctx_l, pg_l = novo_contexto(navegador)
+    entrar(pg_l, email_leitor, senha_leitor)
+    pg_l.wait_for_url(re.compile(r"/index\.html$"))
+    item("o novo leitor consegue logar com a senha gerada", True)
+
+    # desativar o leitor derruba a sessão dele
+    cartao_usuario(page, email_leitor).locator("[data-acao='editar']").click()
+    page.wait_for_selector("#dlg-editar[open]")
+    page.uncheck("#ed-ativo")
+    page.click("#form-editar button[type=submit]")
+    page.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    item("desativar usuário explica a consequência", "desconectado" in page.inner_text("#dlg-editar .confirmacao-texto"))
+    page.click("#dlg-editar [data-confirmar]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    page.wait_for_function(f"() => document.querySelector(\"article.card[data-email='{email_leitor}']\").innerText.includes('Inativo')")
+    pg_l.reload()
+    pg_l.wait_for_url(re.compile(r"/login\.html"))
+    item("a sessão do leitor desativado cai (401 leva ao login)", True)
+    ctx_l.close()
+
+    # único admin: rebaixar a si mesmo dá 409 com a mensagem da API
+    cartao_usuario(page, ADMIN[0]).locator("[data-acao='editar']").click()
+    page.wait_for_selector("#dlg-editar[open]")
+    page.select_option("#ed-perfil", "leitor")
+    page.click("#form-editar button[type=submit]")
+    page.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    page.click("#dlg-editar [data-confirmar]")
+    page.wait_for_function("() => !document.querySelector('#dlg-editar .erro-dialogo').hidden")
+    msg = page.inner_text("#dlg-editar .erro-dialogo")
+    item("rebaixar o único admin mostra o 409 da API", "pelo menos um admin ativo" in msg, msg)
+    item("continua admin depois do 409", "Usuários" in itens_menu(page))
+    page.click("#dlg-editar .acoes-form [data-fechar]")
+    page.screenshot(path=str(CAPTURAS / "usuarios_1280.png"), full_page=True)
+
+    # segundo admin: redefinir a própria senha e depois rebaixar a si mesmo
+    email_admin = f"admin.{sufixo}@teste.com"
+    senha_admin = criar_usuario(page, f"Admin Teste {sufixo}", email_admin, "admin")
+    ctx_a, pg_a = novo_contexto(navegador)
+    entrar(pg_a, email_admin, senha_admin)
+    pg_a.wait_for_url(re.compile(r"/index\.html$"))
+    pg_a.goto(f"{BASE}/usuarios.html")
+    pg_a.wait_for_selector("article.card")
+    item("o segundo admin vê as telas de administração", "Usuários" in itens_menu(pg_a))
+
+    cartao_usuario(pg_a, email_admin).locator("[data-acao='editar']").click()
+    pg_a.wait_for_selector("#dlg-editar[open]")
+    pg_a.click("#redefinir")
+    pg_a.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    pg_a.click("#dlg-editar [data-confirmar]")
+    pg_a.wait_for_selector("#dlg-senha[open]")
+    nova_senha = pg_a.inner_text("#senha-gerada")
+    item("redefinir a própria senha mostra a nova senha e avisa da saída", re.fullmatch(SENHA_GERADA, nova_senha) is not None and pg_a.locator("#senha-aviso-sessao").is_visible())
+    pg_a.click("#fechar-senha")
+    pg_a.wait_for_url(re.compile(r"/login\.html\?msg=senha-alterada"))
+    item("depois de redefinir a própria senha vai ao login com a mensagem", "Senha alterada. Entre novamente." in pg_a.inner_text("#info"))
+    entrar(pg_a, email_admin, senha_admin)
+    pg_a.wait_for_selector("#erro:not([hidden])")
+    item("a senha antiga deixou de funcionar", "credenciais" in pg_a.inner_text("#erro").lower())
+    pg_a.fill("#senha", nova_senha)
+    pg_a.click("#entrar")
+    pg_a.wait_for_url(re.compile(r"/index\.html$"))
+
+    pg_a.goto(f"{BASE}/usuarios.html")
+    pg_a.wait_for_selector("article.card")
+    cartao_usuario(pg_a, email_admin).locator("[data-acao='editar']").click()
+    pg_a.wait_for_selector("#dlg-editar[open]")
+    pg_a.select_option("#ed-perfil", "leitor")
+    pg_a.click("#form-editar button[type=submit]")
+    pg_a.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    pg_a.click("#dlg-editar [data-confirmar]")
+    pg_a.wait_for_url(re.compile(r"/index\.html$"))
+    pg_a.wait_for_selector("#menu a", state="attached")
+    menu = itens_menu(pg_a)
+    item("com dois admins, rebaixar a si mesmo vai para index e some o menu admin", not (ITENS_ADMIN & menu), ", ".join(sorted(menu)))
+    ctx_a.close()
+
+    # limpeza: desativa o segundo admin (agora leitor)
+    page.reload()
+    page.wait_for_selector(f"article.card[data-email='{email_admin}']")
+    cartao_usuario(page, email_admin).locator("[data-acao='editar']").click()
+    page.wait_for_selector("#dlg-editar[open]")
+    page.uncheck("#ed-ativo")
+    page.click("#form-editar button[type=submit]")
+    page.wait_for_selector("#dlg-editar .confirmacao:not([hidden])")
+    page.click("#dlg-editar [data-confirmar]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    item("usuários de teste desativados (limpeza)", True)
+
+
+def testar_celular_admin(page) -> None:
+    print("--- admin: celular")
+    page.set_viewport_size({"width": 390, "height": 844})
+    for nome in ("dispositivos", "faixas", "usuarios"):
+        page.goto(f"{BASE}/{nome}.html")
+        page.wait_for_selector("article.card")
+        page.wait_for_timeout(300)
+        item(f"{nome} 390 px: sem rolagem horizontal", sem_rolagem_horizontal(page))
+        page.screenshot(path=str(CAPTURAS / f"{nome}_390.png"), full_page=True)
+    # diálogo aberto no celular (editar dispositivo)
+    page.goto(f"{BASE}/dispositivos.html")
+    page.wait_for_selector("article.card[data-id='esp01']")
+    page.click("article.card[data-id='esp01'] [data-acao='editar']")
+    page.wait_for_selector("#dlg-editar[open]")
+    page.wait_for_timeout(300)
+    item("dialog aberto em 390 px: sem rolagem horizontal da página", sem_rolagem_horizontal(page))
+    page.screenshot(path=str(CAPTURAS / "dispositivos_390_dialog.png"))
+    page.click("#dlg-editar .acoes-form [data-fechar]")
+    page.set_viewport_size({"width": 1280, "height": 900})
+
+
+def testar_admin(navegador, page) -> None:
+    sufixo = datetime.now().strftime("%H%M%S")
+    testar_acesso_de_leitor(navegador)
+    device = testar_dispositivos(page, sufixo)
+    testar_faixas(page, sufixo, device)
+    testar_usuarios(navegador, page, sufixo)
+    testar_celular_admin(page)
+
+
 def main() -> None:
     CAPTURAS.mkdir(exist_ok=True)
     with sync_playwright() as p:
@@ -225,7 +560,7 @@ def main() -> None:
         page.goto(f"{BASE}/index.html")
         page.wait_for_selector("article.card[data-id='esp01'] .itgu-valor")
         page.wait_for_selector("article.card[data-id='esp02'] .itgu-valor")
-        cards = page.locator("article.card")
+        cards = page.locator("#lista-ativos article.card")
         item("visão geral mostra um card por dispositivo ativo", cards.count() == 2, f"{cards.count()} cards")
 
         for device in ("esp01", "esp02"):
@@ -255,6 +590,10 @@ def main() -> None:
         page.set_viewport_size({"width": 360, "height": 740})
         item("360 px: sem rolagem horizontal", sem_rolagem_horizontal(page))
         page.set_viewport_size({"width": 1280, "height": 900})
+
+        testar_admin(navegador, page)
+        page.goto(f"{BASE}/index.html")
+        page.wait_for_selector("#btn-sair")
 
         # logout
         page.click("#btn-sair")

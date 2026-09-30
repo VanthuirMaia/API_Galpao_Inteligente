@@ -186,3 +186,44 @@ input:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visibl
 }
 
 .secao-espaco { margin-top: 1.5rem; }
+
+/* ---------- administração ---------- */
+.barra-acoes { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+.barra-acoes .botao-simples { width: auto; }
+.toast { position: sticky; top: .5rem; z-index: 5; }
+.card .acoes-card { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.chip.inativo { background: var(--semfaixa-fundo); color: var(--semfaixa-texto); }
+.card .linha-info { margin: .2rem 0; font-size: .9rem; }
+.card .linha-info .rot { color: var(--suave); }
+.botao-simples.perigo { background: var(--critico-texto); border-color: var(--critico-texto); color: #fff; }
+.botao-simples.pequeno { padding: .35rem .7rem; font-size: .9rem; }
+
+/* diálogos */
+dialog { width: calc(100% - 1.5rem); max-width: 520px; border: 1px solid var(--borda); border-radius: 12px; padding: 1.1rem; color: var(--texto); background: var(--caixa); }
+dialog::backdrop { background: rgba(15, 23, 32, .5); }
+dialog h2 { margin-top: 0; }
+dialog label:first-of-type { margin-top: 0; }
+dialog select, dialog input[type="date"], dialog input[type="number"], dialog input[type="text"], dialog input[type="email"] {
+  width: 100%; font: inherit; padding: .55rem .6rem; border: 1px solid var(--borda); border-radius: 6px; background: #fff; color: var(--texto);
+}
+.ajuda { font-size: .8rem; color: var(--suave); margin: .25rem 0 0; }
+.acoes-form, .confirmacao .acoes { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
+.confirmacao { margin-top: 1rem; padding: .75rem; border-radius: 8px; background: var(--alerta-fundo); color: var(--alerta-texto); }
+.confirmacao p { margin: 0; font-weight: 600; }
+.campo-check { display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+.campo-check input { width: auto; }
+.duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem .75rem; }
+.duas-colunas > div { min-width: 0; }
+.destaque { background: var(--conforto-fundo); color: var(--conforto-texto); border-radius: 8px; padding: .75rem; margin: .75rem 0; }
+.comando { font-family: ui-monospace, Consolas, monospace; font-size: .85rem; background: var(--fundo); color: var(--texto); padding: .6rem; border-radius: 6px; overflow-wrap: anywhere; margin: .5rem 0; }
+.senha-gerada { font-family: ui-monospace, Consolas, monospace; font-size: 1.3rem; font-weight: 700; letter-spacing: .05em; background: var(--fundo); padding: .7rem; border-radius: 8px; text-align: center; overflow-wrap: anywhere; user-select: all; }
+.aviso-forte { background: var(--alerta-fundo); color: var(--alerta-texto); border-radius: 8px; padding: .8rem 1rem; margin-bottom: 1rem; font-weight: 600; }
+
+/* régua das faixas de ITGU: as 5 zonas; o tamanho de cada uma vem de --peso (definido via CSSOM) */
+.regua { display: flex; height: 18px; border-radius: 6px; overflow: hidden; margin: .5rem 0 .25rem; }
+.zona { flex-grow: var(--peso, 1); flex-basis: 0; }
+.zona.critico { background: #e8838a; }
+.zona.alerta { background: #f5d76e; }
+.zona.conforto { background: #6cc78a; }
+
+.sem-margem { margin: 0; }

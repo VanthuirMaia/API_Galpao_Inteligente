@@ -16,6 +16,13 @@ async function mensagemDeErro(resposta) {
   return `Erro ${resposta.status}`;
 }
 
+/** Erro com a mensagem da API e o status HTTP em erro.status. */
+async function erroHttp(resposta) {
+  const erro = new Error(await mensagemDeErro(resposta));
+  erro.status = resposta.status;
+  return erro;
+}
+
 /**
  * Chama a API com o token da sessão. Corpo e resposta em JSON.
  * 401: limpa a sessão e vai para o login. Outros erros: lança Error com a mensagem da API.
@@ -36,7 +43,7 @@ export async function api(metodo, caminho, corpo) {
     irParaLogin();
     throw new Error("Sessão expirada. Entre novamente.");
   }
-  if (!resposta.ok) throw new Error(await mensagemDeErro(resposta));
+  if (!resposta.ok) throw await erroHttp(resposta);
   if (resposta.status === 204) return null;
   return resposta.json();
 }
@@ -50,7 +57,7 @@ export async function login(email, senha) {
     body: corpo,
   });
   if (resposta.status === 429) throw new Error("Muitas tentativas. Aguarde um minuto.");
-  if (!resposta.ok) throw new Error(await mensagemDeErro(resposta));
+  if (!resposta.ok) throw await erroHttp(resposta);
   return resposta.json(); // {access_token, token_type, perfil, nome}
 }
 
@@ -65,7 +72,7 @@ export async function baixarArquivo(caminho) {
     irParaLogin();
     throw new Error("Sessão expirada. Entre novamente.");
   }
-  if (!resposta.ok) throw new Error(await mensagemDeErro(resposta));
+  if (!resposta.ok) throw await erroHttp(resposta);
   const m = /filename="?([^";]+)"?/.exec(resposta.headers.get("Content-Disposition") || "");
   return { blob: await resposta.blob(), nome: m ? m[1] : "galpao.csv" };
 }

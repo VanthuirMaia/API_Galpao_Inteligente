@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dispositivos - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo" id="principal" data-estado="carregando">
+    <div class="barra-acoes">
+      <h1>Dispositivos</h1>
+      <button id="btn-novo" type="button" class="botao-simples">Novo dispositivo</button>
+    </div>
+    <p id="aviso-ok" class="msg ok toast" role="status" hidden></p>
+    <p id="erro-pagina" class="msg erro" role="alert" hidden></p>
+    <p id="carregando" class="sub">Carregando…</p>
+    <section id="lista" class="grade-cards" aria-label="Dispositivos"></section>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+
+  <!-- novo dispositivo -->
+  <dialog id="dlg-novo" aria-labelledby="t-novo">
+    <h2 id="t-novo">Novo dispositivo</h2>
+    <form id="form-novo" novalidate>
+      <label for="novo-id">Identificador (id)</label>
+      <input id="novo-id" type="text" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <p class="ajuda">Letras minúsculas, números, - e _ (3 a 32 caracteres). Será também o usuário MQTT do ESP.</p>
+      <label for="novo-ambiente">Ambiente</label>
+      <select id="novo-ambiente">
+        <option value="real">Galpão real</option>
+        <option value="modelo">Galpão-modelo</option>
+      </select>
+      <label for="novo-descricao">Descrição (opcional)</label>
+      <input id="novo-descricao" type="text" maxlength="120">
+      <p class="msg erro erro-dialogo" role="alert" hidden></p>
+      <div class="acoes-form">
+        <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>
+        <button type="submit" class="botao-simples">Criar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- resultado da criação: aviso e comando para criar o usuário MQTT -->
+  <dialog id="dlg-criado" aria-labelledby="t-criado">
+    <h2 id="t-criado">Dispositivo criado</h2>
+    <div class="destaque">
+      <p id="criado-aviso" class="sem-margem"></p>
+    </div>
+    <p>Rode este comando na VPS, na pasta do projeto:</p>
+    <p id="criado-comando" class="comando"></p>
+    <button id="copiar-comando" type="button" class="botao-simples claro pequeno">Copiar comando</button>
+    <p class="ajuda">Troque <code>&lt;senha&gt;</code> por uma senha que você escolhe na VPS. Ela nunca passa pelo painel. Depois grave essa mesma senha no firmware do ESP.</p>
+    <div class="acoes-form">
+      <button type="button" class="botao-simples" data-fechar>Fechar</button>
+    </div>
+  </dialog>
+
+  <!-- editar dispositivo -->
+  <dialog id="dlg-editar" aria-labelledby="t-editar">
+    <h2 id="t-editar">Editar dispositivo</h2>
+    <form id="form-editar" novalidate>
+      <p class="sub" id="editar-id"></p>
+      <label for="ed-descricao">Descrição</label>
+      <input id="ed-descricao" type="text" maxlength="120">
+      <label for="ed-ambiente">Ambiente</label>
+      <select id="ed-ambiente">
+        <option value="real">Galpão real</option>
+        <option value="modelo">Galpão-modelo</option>
+      </select>
+      <label class="campo-check" for="ed-ativo"><input id="ed-ativo" type="checkbox"> Dispositivo ativo</label>
+
+      <label for="ed-data">Data de alojamento do lote</label>
+      <div class="duas-colunas">
+        <input id="ed-data" type="date">
+        <button id="encerrar-lote" type="button" class="botao-simples claro">Encerrar lote</button>
+      </div>
+      <p id="ed-previa" class="ajuda"></p>
+
+      <label for="ed-faixa">Faixa de ITGU</label>
+      <select id="ed-faixa"></select>
+      <p class="ajuda">Automática: a faixa é escolhida pela idade do lote. Escolher uma faixa à mão vale acima da idade.</p>
+
+      <p class="msg erro erro-dialogo" role="alert" hidden></p>
+      <div class="confirmacao" hidden>
+        <p class="confirmacao-texto"></p>
+        <div class="acoes">
+          <button type="button" class="botao-simples claro" data-voltar>Voltar</button>
+          <button type="button" class="botao-simples perigo" data-confirmar>Confirmar</button>
+        </div>
+      </div>
+      <div class="acoes-form">
+        <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>
+        <button type="submit" class="botao-simples">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/dispositivos.js"></script>
+</body>
+</html>

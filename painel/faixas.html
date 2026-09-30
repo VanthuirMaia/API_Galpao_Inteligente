@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faixas de ITGU - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo" id="principal" data-estado="carregando">
+    <div class="barra-acoes">
+      <h1>Faixas de ITGU</h1>
+      <button id="btn-nova" type="button" class="botao-simples">Nova faixa</button>
+    </div>
+    <p id="aviso-ok" class="msg ok toast" role="status" hidden></p>
+    <p id="erro-pagina" class="msg erro" role="alert" hidden></p>
+    <p id="carregando" class="sub">Carregando…</p>
+
+    <p id="sem-faixas" class="aviso-forte" hidden>
+      Nenhuma faixa cadastrada. Os valores devem vir do responsável técnico (zootecnia) ou do manual da linhagem.
+      Sem faixas, as leituras aparecem como "sem faixa definida".
+    </p>
+    <p id="cobertura" class="msg aviso" role="status" hidden></p>
+
+    <section id="lista" class="grade-cards" aria-label="Faixas"></section>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+
+  <!-- nova / editar faixa -->
+  <dialog id="dlg-faixa" aria-labelledby="t-faixa">
+    <h2 id="t-faixa">Nova faixa</h2>
+    <form id="form-faixa" novalidate>
+      <label for="f-nome">Nome</label>
+      <input id="f-nome" type="text" maxlength="80" placeholder="Ex.: Semana 1">
+      <div class="duas-colunas">
+        <div>
+          <label for="f-ini">Idade início (dias)</label>
+          <input id="f-ini" type="number" min="0" step="1" inputmode="numeric">
+        </div>
+        <div>
+          <label for="f-fim">Idade fim (dias)</label>
+          <input id="f-fim" type="number" min="0" step="1" inputmode="numeric">
+        </div>
+        <div>
+          <label for="f-cmin">Crítico mínimo</label>
+          <input id="f-cmin" type="number" step="any" inputmode="decimal">
+        </div>
+        <div>
+          <label for="f-mmin">Conforto mínimo</label>
+          <input id="f-mmin" type="number" step="any" inputmode="decimal">
+        </div>
+        <div>
+          <label for="f-mmax">Conforto máximo</label>
+          <input id="f-mmax" type="number" step="any" inputmode="decimal">
+        </div>
+        <div>
+          <label for="f-cmax">Crítico máximo</label>
+          <input id="f-cmax" type="number" step="any" inputmode="decimal">
+        </div>
+      </div>
+      <p class="ajuda">Precisa valer: crítico mínimo &lt; conforto mínimo &lt; conforto máximo &lt; crítico máximo. As idades são em dias de vida e incluem as duas pontas (o dia do alojamento é a idade 0).</p>
+      <p class="msg erro erro-dialogo" role="alert" hidden></p>
+      <div class="acoes-form">
+        <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>
+        <button type="submit" class="botao-simples">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- confirmar desativar / reativar -->
+  <dialog id="dlg-confirma" aria-labelledby="t-confirma">
+    <h2 id="t-confirma">Confirmar</h2>
+    <p id="confirma-texto"></p>
+    <p class="msg erro erro-dialogo" role="alert" hidden></p>
+    <div class="acoes-form">
+      <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>
+      <button id="confirma-ok" type="button" class="botao-simples perigo">Confirmar</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/faixas.js"></script>
+</body>
+</html>
