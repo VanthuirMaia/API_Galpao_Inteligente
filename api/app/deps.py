@@ -4,7 +4,9 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.seguranca import decodificar_token
 
-oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/login")
+# tokenUrl relativo (sem "/" inicial): o Swagger resolve a partir da página /docs ou /api/docs,
+# então funciona com e sem o prefixo do proxy (ROOT_PATH)
+oauth2 = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def get_conn(request: Request):

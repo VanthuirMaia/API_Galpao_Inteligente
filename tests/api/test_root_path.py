@@ -22,6 +22,18 @@ def test_openapi_declara_o_servidor_com_prefixo(app_com_prefixo):
     assert r.json()["servers"] == [{"url": "/api"}]
 
 
+@pytest.mark.parametrize("prefixo", ["/api", ""])
+def test_token_url_relativo_no_swagger(monkeypatch, prefixo):
+    """Sem barra inicial, o Swagger resolve /api/docs -> /api/auth/login e /docs -> /auth/login."""
+    monkeypatch.setenv("ROOT_PATH", prefixo)
+    try:
+        esquemas = TestClient(importlib.reload(app.main).app).get("/openapi.json").json()["components"]["securitySchemes"]
+        assert esquemas["OAuth2PasswordBearer"]["flows"]["password"]["tokenUrl"] == "auth/login"
+    finally:
+        monkeypatch.undo()
+        importlib.reload(app.main)
+
+
 def test_rotas_respondem_sem_o_prefixo(app_com_prefixo):
     # o Traefik remove /api antes de repassar: a API continua atendendo em /saude, /auth/...
     c = TestClient(app_com_prefixo)
