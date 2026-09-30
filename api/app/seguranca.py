@@ -41,5 +41,6 @@ def decodificar_token(token: str) -> dict:
         token,
         config.jwt_secret(),
         algorithms=[ALGORITMO],
-        options={"require": ["exp", "sub"]},
+        options={"require": ["exp", "sub", "iat"]},
+        leeway=10,  # tolera pequena diferença de relógio (iat "no futuro") entre API e banco
     )

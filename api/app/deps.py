@@ -24,18 +24,24 @@ def _nao_autenticado() -> HTTPException:
 def usuario_atual(token: str = Depends(oauth2), conn=Depends(get_conn)) -> dict:
     """Usuário do token, buscado no banco a cada requisição.
 
-    Assim, desativar um usuário corta o acesso na hora, sem esperar o token expirar.
+    Assim, desativar um usuário (ou trocar a senha dele) corta o acesso na hora.
     """
     try:
-        usuario_id = int(decodificar_token(token)["sub"])
-    except (jwt.PyJWTError, KeyError, ValueError):
+        dados = decodificar_token(token)
+        usuario_id = int(dados["sub"])
+        emitido_em = int(dados["iat"])
+    except (jwt.PyJWTError, KeyError, ValueError, TypeError):
         raise _nao_autenticado()
 
     usuario = conn.execute(
-        "SELECT id, email, nome, perfil, ativo FROM galpao.usuarios WHERE id = %s",
+        "SELECT id, email, nome, perfil, ativo, senha_alterada_em FROM galpao.usuarios WHERE id = %s",
         (usuario_id,),
     ).fetchone()
     if usuario is None or not usuario["ativo"]:
+        raise _nao_autenticado()
+    # Token emitido antes da última troca de senha. O iat é em segundos inteiros: compara com o
+    # instante TRUNCADO para segundos, senão um login no mesmo segundo da troca seria rejeitado.
+    if emitido_em < int(usuario["senha_alterada_em"].timestamp()):
         raise _nao_autenticado()
     return usuario
 

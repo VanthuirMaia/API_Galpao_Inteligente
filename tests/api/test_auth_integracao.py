@@ -22,7 +22,7 @@ HASH = hash_senha(SENHA)  # um hash só, reaproveitado
 @pytest.fixture(scope="module")
 def conn():
     with psycopg.connect(URL, autocommit=True) as c:
-        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql"):
+        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql"):
             c.execute((DB / arq).read_text(encoding="utf-8"))
         yield c
 

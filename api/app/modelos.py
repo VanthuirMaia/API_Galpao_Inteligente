@@ -1,9 +1,27 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
+
+from app.classificacao import hoje_recife  # noqa: E402
 
 SENHA_MIN = 10
+
+
+class FaixaResumoOut(BaseModel):
+    id: int
+    nome: str
+    critico_min: float
+    conforto_min: float
+    conforto_max: float
+    critico_max: float
+
+
+class SituacaoOut(BaseModel):
+    idade_dias: int | None
+    origem_faixa: Literal["manual", "idade"] | None
+    faixa: FaixaResumoOut | None
+    classificacao: Literal["conforto", "alerta", "critico", "sem_faixa"] | None  # null: sem leitura
 
 
 class DispositivoOut(BaseModel):
@@ -11,8 +29,11 @@ class DispositivoOut(BaseModel):
     ambiente: str
     descricao: str | None
     ativo: bool
+    data_alojamento: date | None
+    faixa_manual_id: int | None
     ultima_leitura_em: datetime | None
     online: bool
+    situacao: SituacaoOut
 
 
 class LeituraOut(BaseModel):
@@ -32,6 +53,7 @@ class LeituraOut(BaseModel):
 class UltimaOut(BaseModel):
     device_id: str
     leitura: LeituraOut | None
+    situacao: SituacaoOut
 
 
 class LeituraAgregadaOut(BaseModel):
@@ -78,6 +100,8 @@ class DispositivoBaseOut(BaseModel):
     ambiente: str
     descricao: str | None
     ativo: bool
+    data_alojamento: date | None
+    faixa_manual_id: int | None
     criado_em: datetime
 
 
@@ -89,6 +113,15 @@ class DispositivoPatch(BaseModel):
     descricao: str | None = None  # null apaga a descrição
     ambiente: Literal["modelo", "real"] | None = None
     ativo: bool | None = None
+    data_alojamento: date | None = None  # null limpa
+    faixa_manual_id: int | None = None  # null volta a usar a faixa pela idade
+
+    @field_validator("data_alojamento")
+    @classmethod
+    def _nao_futura(cls, v):
+        if v is not None and v > hoje_recife():
+            raise ValueError("data_alojamento não pode ser futura")
+        return v
 
     @model_validator(mode="after")
     def _validar(self):
@@ -146,3 +179,65 @@ def _exigir_campos(modelo, nao_nulos: tuple[str, ...]):
         if campo in enviados and getattr(modelo, campo) is None:
             raise ValueError(f"{campo} não pode ser nulo")
     return modelo
+
+
+class TokenSenhaOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+# ---------- faixas de ITGU ----------
+
+def erro_faixa(f: dict) -> str | None:
+    """Mensagem de erro se idades ou limites da faixa estão fora de ordem; senão None."""
+    if f["idade_fim_dias"] < f["idade_inicio_dias"]:
+        return "idade_fim_dias deve ser >= idade_inicio_dias"
+    if not f["critico_min"] < f["conforto_min"] < f["conforto_max"] < f["critico_max"]:
+        return "limites devem obedecer critico_min < conforto_min < conforto_max < critico_max"
+    return None
+
+
+class FaixaIn(BaseModel):
+    nome: str = Field(min_length=1)
+    idade_inicio_dias: int = Field(ge=0)
+    idade_fim_dias: int = Field(ge=0)
+    critico_min: float
+    conforto_min: float
+    conforto_max: float
+    critico_max: float
+
+    @model_validator(mode="after")
+    def _ordem(self):
+        erro = erro_faixa(self.model_dump())
+        if erro:
+            raise ValueError(erro)
+        return self
+
+
+class FaixaPatch(BaseModel):
+    nome: str | None = Field(None, min_length=1)
+    idade_inicio_dias: int | None = Field(None, ge=0)
+    idade_fim_dias: int | None = Field(None, ge=0)
+    critico_min: float | None = None
+    conforto_min: float | None = None
+    conforto_max: float | None = None
+    critico_max: float | None = None
+    ativo: bool | None = None
+
+    @model_validator(mode="after")
+    def _validar(self):
+        # a ordem dos limites é checada na rota, com os valores atuais dos campos não enviados
+        return _exigir_campos(self, tuple(type(self).model_fields))
+
+
+class FaixaOut(BaseModel):
+    id: int
+    nome: str
+    idade_inicio_dias: int
+    idade_fim_dias: int
+    critico_min: float
+    conforto_min: float
+    conforto_max: float
+    critico_max: float
+    ativo: bool
+    criado_em: datetime

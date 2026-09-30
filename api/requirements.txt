@@ -7,3 +7,4 @@ pwdlib[argon2]
 # exigido pelo OAuth2PasswordRequestForm (login por formulário)
 python-multipart
 email-validator
+tzdata

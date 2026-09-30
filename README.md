@@ -16,9 +16,9 @@ O PostgreSQL roda direto no host (localhost:5432) e não é alterado pelo projet
    ```
    git clone <URL_DO_REPOSITORIO> galpao-api && cd galpao-api
    ```
-2. Criar o banco `galpao` e aplicar `001`, `002` e `003` (como `postgres`; se a VPS já tem a 001 e a 002 aplicadas, rode só `sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao -f db/003_usuarios_api.sql`):
+2. Criar o banco `galpao` e aplicar `001` a `004` (como `postgres`; se a VPS já tem as primeiras aplicadas, rode só as novas, em ordem, com `sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao -f db/004_faixas_itgu.sql`; a 004 faz os usuários já logados precisarem entrar de novo):
    ```
-   sudo -u postgres createdb galpao && cat db/001_init.sql db/002_permissoes.sql db/003_usuarios_api.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
+   sudo -u postgres createdb galpao && cat db/001_init.sql db/002_permissoes.sql db/003_usuarios_api.sql db/004_faixas_itgu.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
    ```
 3. Definir as senhas das roles `galpao_ingestor` e `galpao_api` (hex, para não quebrar a URL do banco) e anotá-las:
    ```

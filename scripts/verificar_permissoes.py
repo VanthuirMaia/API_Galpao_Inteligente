@@ -76,6 +76,18 @@ def main() -> None:
             "VALUES ('esp01', now(), 'esp', 1, 1, 1, 1, 1, '{}')",
         )
         deve_ser_negado(conn, "DELETE em galpao.usuarios negado", "DELETE FROM galpao.usuarios")
+        # INSERT em faixas_itgu: dentro de transação descartada, sem deixar registro
+        try:
+            with conn.transaction(force_rollback=True):
+                n = conn.execute(
+                    "INSERT INTO galpao.faixas_itgu (nome, idade_inicio_dias, idade_fim_dias, critico_min, "
+                    "conforto_min, conforto_max, critico_max, ativo) "
+                    "VALUES ('verificar_permissoes', 0, 0, 1, 2, 3, 4, false)"
+                ).rowcount
+            item("INSERT em galpao.faixas_itgu (desfeito)", n == 1)
+        except psycopg.Error as e:
+            item("INSERT em galpao.faixas_itgu (desfeito)", False, str(e))
+        deve_ser_negado(conn, "DELETE em galpao.faixas_itgu negado", "DELETE FROM galpao.faixas_itgu")
         # UPDATE em dispositivos: altera e restaura o mesmo valor
         try:
             orig = conn.execute("SELECT descricao FROM galpao.dispositivos WHERE id = 'esp01'").fetchone()[0]

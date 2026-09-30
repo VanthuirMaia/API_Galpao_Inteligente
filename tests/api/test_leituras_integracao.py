@@ -47,7 +47,7 @@ DADOS = gerar_dados()  # índice = minutos atrás
 @pytest.fixture(scope="module")
 def conn():
     with psycopg.connect(URL, autocommit=True) as c:
-        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql"):
+        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql"):
             c.execute((DB / arq).read_text(encoding="utf-8"))
         c.execute("TRUNCATE galpao.leituras, galpao.erros_ingestao, galpao.usuarios RESTART IDENTITY")
         c.execute("UPDATE galpao.dispositivos SET ativo = true")
@@ -167,7 +167,9 @@ def test_ultima_inexistente_404(client, h):
 def test_ultima_sem_leituras(client, h):
     r = client.get("/dispositivos/esp03/ultima", headers=h)
     assert r.status_code == 200
-    assert r.json() == {"device_id": "esp03", "leitura": None}
+    corpo = r.json()
+    assert corpo["device_id"] == "esp03" and corpo["leitura"] is None
+    assert corpo["situacao"]["classificacao"] is None  # sem leitura, sem classificação
 
 
 # ---------- /leituras ----------

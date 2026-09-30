@@ -1,4 +1,3 @@
-import psycopg
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from psycopg import sql
 
@@ -72,7 +71,7 @@ def atualizar(usuario_id: int, dados: UsuarioPatch, conn=Depends(get_conn)):
 def definir_senha(usuario_id: int, dados: SenhaIn, conn=Depends(get_conn)):
     """Admin define uma nova senha para o usuário."""
     n = conn.execute(
-        "UPDATE galpao.usuarios SET senha_hash = %s WHERE id = %s",
+        "UPDATE galpao.usuarios SET senha_hash = %s, senha_alterada_em = now() WHERE id = %s",
         (hash_senha(dados.senha), usuario_id),
     ).rowcount
     if n == 0:

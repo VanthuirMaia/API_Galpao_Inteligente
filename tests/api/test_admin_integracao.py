@@ -25,7 +25,7 @@ HASH = hash_senha(SENHA)
 @pytest.fixture(scope="module")
 def conn():
     with psycopg.connect(URL, autocommit=True) as c:
-        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql"):
+        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql"):
             c.execute((DB / arq).read_text(encoding="utf-8"))
         yield c
 
@@ -308,7 +308,8 @@ def trocar(client, cabecalho, atual, nova):
 
 
 def test_trocar_propria_senha(client):
-    assert trocar(client, LEITOR(), SENHA, "senha-trocada-789").status_code == 204
+    r = trocar(client, LEITOR(), SENHA, "senha-trocada-789")
+    assert r.status_code == 200 and r.json()["token_type"] == "bearer" and r.json()["access_token"]
     assert login(client, "leitor@teste.com", SENHA).status_code == 401
     assert login(client, "leitor@teste.com", "senha-trocada-789").status_code == 200
 
