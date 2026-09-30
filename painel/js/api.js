@@ -53,3 +53,19 @@ export async function login(email, senha) {
   if (!resposta.ok) throw new Error(await mensagemDeErro(resposta));
   return resposta.json(); // {access_token, token_type, perfil, nome}
 }
+
+/**
+ * Baixa um arquivo que exige token (o <a download> puro não envia o Authorization).
+ * Devolve {blob, nome}; o nome vem do Content-Disposition do servidor.
+ */
+export async function baixarArquivo(caminho) {
+  const resposta = await fetch(BASE + caminho, { headers: { Authorization: `Bearer ${token()}` } });
+  if (resposta.status === 401) {
+    limparSessao();
+    irParaLogin();
+    throw new Error("Sessão expirada. Entre novamente.");
+  }
+  if (!resposta.ok) throw new Error(await mensagemDeErro(resposta));
+  const m = /filename="?([^";]+)"?/.exec(resposta.headers.get("Content-Disposition") || "");
+  return { blob: await resposta.blob(), nome: m ? m[1] : "galpao.csv" };
+}

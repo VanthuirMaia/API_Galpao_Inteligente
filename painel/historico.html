@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Histórico - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo" id="principal" data-estado="carregando">
+    <div class="titulo-pagina"><h1>Histórico</h1></div>
+
+    <section class="filtros" aria-label="Filtros">
+      <label for="dispositivo">Dispositivo</label>
+      <select id="dispositivo"></select>
+
+      <label id="rotulo-periodo">Período</label>
+      <div class="grupo-botoes" role="group" aria-labelledby="rotulo-periodo">
+        <button type="button" class="botao-filtro" data-periodo="6h" aria-pressed="false">6 h</button>
+        <button type="button" class="botao-filtro" data-periodo="24h" aria-pressed="true">24 h</button>
+        <button type="button" class="botao-filtro" data-periodo="7d" aria-pressed="false">7 dias</button>
+        <button type="button" class="botao-filtro" data-periodo="30d" aria-pressed="false">30 dias</button>
+        <button type="button" class="botao-filtro" data-periodo="custom" aria-pressed="false">Personalizado</button>
+      </div>
+
+      <div id="personalizado" class="personalizado" hidden>
+        <div>
+          <label for="inicio">Início (horário de Recife)</label>
+          <input id="inicio" type="datetime-local">
+        </div>
+        <div>
+          <label for="fim">Fim (horário de Recife)</label>
+          <input id="fim" type="datetime-local">
+        </div>
+        <button id="aplicar" type="button" class="botao-simples">Aplicar</button>
+      </div>
+
+      <p id="agregacao" class="agregacao" aria-live="polite"></p>
+    </section>
+
+    <p id="carregando" class="sub">Carregando…</p>
+    <p id="erro" class="msg erro" role="alert" hidden></p>
+    <p id="vazio" class="msg aviso" role="status" hidden>Nenhuma leitura neste período.</p>
+
+    <div id="conteudo-dados" hidden>
+      <section aria-label="Resumo do período">
+        <div id="resumo" class="resumo"></div>
+        <p id="nota-resumo" class="nota"></p>
+      </section>
+
+      <section class="grafico-caixa">
+        <h2>ITGU</h2>
+        <p id="aviso-faixa" class="msg aviso" hidden>Sem faixa definida para este dispositivo hoje: o gráfico mostra só a linha do ITGU.</p>
+        <div class="grafico-area"><canvas id="grafico-itgu" role="img" aria-label="Gráfico do ITGU ao longo do tempo"></canvas></div>
+      </section>
+
+      <section class="grafico-caixa">
+        <h2>Temperaturas</h2>
+        <div class="grafico-area"><canvas id="grafico-temp" role="img" aria-label="Gráfico das temperaturas ao longo do tempo"></canvas></div>
+      </section>
+
+      <section class="grafico-caixa">
+        <h2>Umidade</h2>
+        <div class="grafico-area"><canvas id="grafico-ur" role="img" aria-label="Gráfico da umidade ao longo do tempo"></canvas></div>
+      </section>
+
+      <section aria-label="Exportar">
+        <h2>Exportar CSV</h2>
+        <div class="exportar">
+          <button id="csv-bruto" type="button" class="botao-simples">Dados brutos</button>
+          <button id="csv-agregado" type="button" class="botao-simples claro">Dados agregados</button>
+        </div>
+        <p id="erro-csv" class="msg erro" role="alert" hidden></p>
+      </section>
+    </div>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+
+  <!-- Chart.js 4.5.1 (MIT), build UMD local em vendor/; licença em vendor/LICENSE-chartjs.txt.
+       Sem adaptador de datas: o eixo x é linear, em milissegundos. -->
+  <script src="vendor/chart.umd.min.js"></script>
+  <script type="module" src="js/historico.js"></script>
+</body>
+</html>

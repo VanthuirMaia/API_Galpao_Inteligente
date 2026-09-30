@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagnóstico - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo" id="principal" data-estado="carregando">
+    <div class="titulo-pagina">
+      <h1>Diagnóstico</h1>
+      <p id="atualizado" class="sub" aria-live="polite"></p>
+    </div>
+    <p id="aviso" class="msg aviso" role="status" hidden></p>
+    <p id="erro" class="msg erro" role="alert" hidden></p>
+
+    <section aria-labelledby="t-situacao">
+      <h2 id="t-situacao">Situação dos dispositivos</h2>
+      <div id="lista-situacao" class="grade-cards"></div>
+    </section>
+
+    <section aria-labelledby="t-erros" class="secao-espaco">
+      <h2 id="t-erros">Mensagens rejeitadas</h2>
+      <div class="filtros">
+        <div class="filtros-linha">
+          <div>
+            <label for="filtro-dispositivo">Dispositivo</label>
+            <select id="filtro-dispositivo"><option value="">Todos</option></select>
+          </div>
+        </div>
+        <label class="opcao" for="auto"><input id="auto" type="checkbox" checked> Atualizar automaticamente a cada 30 s</label>
+      </div>
+      <p id="sem-erros" class="msg ok" hidden>Nenhuma mensagem rejeitada recentemente.</p>
+      <table id="tabela-erros" class="tabela-erros" hidden>
+        <thead>
+          <tr><th>Hora</th><th>Dispositivo</th><th>Motivo</th><th>Mensagem</th></tr>
+        </thead>
+        <tbody id="corpo-erros"></tbody>
+      </table>
+    </section>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+  <script type="module" src="js/diagnostico.js"></script>
+</body>
+</html>
