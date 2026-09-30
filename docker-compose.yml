@@ -1,4 +1,10 @@
 # Base comum a dev e produção. O Postgres não entra aqui.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   mosquitto:
     image: eclipse-mosquitto:2
@@ -7,6 +13,7 @@ services:
     volumes:
       - ./mosquitto/config:/mosquitto/config:ro
       - mosquitto_data:/mosquitto/data
+    logging: *logging
     restart: unless-stopped
 
   ingestor:
@@ -14,6 +21,7 @@ services:
     env_file: .env
     depends_on:
       - mosquitto
+    logging: *logging
     restart: unless-stopped
 
 volumes:

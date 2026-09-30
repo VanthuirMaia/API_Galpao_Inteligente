@@ -1,0 +1,6 @@
+# Overlay de produção: o Postgres roda no host da VPS (localhost:5432).
+# Uso: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  ingestor:
+    # alcança o Postgres em localhost:5432 e o Mosquitto em 127.0.0.1:1883 (porta publicada no host)
+    network_mode: host
