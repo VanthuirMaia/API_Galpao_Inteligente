@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visão geral - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo">
+    <div class="titulo-pagina">
+      <h1>Visão geral</h1>
+      <p id="atualizado" class="sub" aria-live="polite"></p>
+    </div>
+    <p id="aviso" class="msg aviso" role="status" hidden></p>
+    <p id="erro" class="msg erro" role="alert" hidden></p>
+    <p id="carregando" class="sub">Carregando…</p>
+    <section id="lista-ativos" class="grade-cards" aria-label="Dispositivos ativos"></section>
+    <details id="inativos" class="inativos" hidden>
+      <summary id="resumo-inativos"></summary>
+      <div id="lista-inativos" class="grade-cards"></div>
+    </details>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+  <script type="module" src="js/visao_geral.js"></script>
+</body>
+</html>

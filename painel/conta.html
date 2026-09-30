@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minha conta - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="cabecalho" class="cabecalho"></header>
+  <main class="conteudo estreito">
+    <div class="titulo-pagina"><h1>Minha conta</h1></div>
+
+    <section class="painel-caixa" aria-labelledby="t-dados">
+      <h2 id="t-dados">Meus dados</h2>
+      <p id="erro-dados" class="msg erro" role="alert" hidden></p>
+      <dl class="dados">
+        <dt>Nome</dt><dd id="d-nome">…</dd>
+        <dt>E-mail</dt><dd id="d-email">…</dd>
+        <dt>Perfil</dt><dd id="d-perfil">…</dd>
+      </dl>
+    </section>
+
+    <section class="painel-caixa" aria-labelledby="t-senha">
+      <h2 id="t-senha">Trocar senha</h2>
+      <form id="form-senha" novalidate>
+        <label for="senha-atual">Senha atual</label>
+        <input id="senha-atual" type="password" autocomplete="current-password" required>
+        <label for="senha-nova">Nova senha (mínimo 10 caracteres)</label>
+        <input id="senha-nova" type="password" autocomplete="new-password" minlength="10" required>
+        <label for="senha-confirma">Confirmar nova senha</label>
+        <input id="senha-confirma" type="password" autocomplete="new-password" minlength="10" required>
+        <p id="msg-senha" class="msg" role="status" hidden></p>
+        <button id="trocar" type="submit" class="botao">Trocar senha</button>
+      </form>
+    </section>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+  <script type="module" src="js/conta.js"></script>
+</body>
+</html>

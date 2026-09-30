@@ -8,3 +8,6 @@ venv/
 # Segredos e configuração local
 .env
 mosquitto/config/passwd
+
+# capturas de tela do teste do painel
+capturas/

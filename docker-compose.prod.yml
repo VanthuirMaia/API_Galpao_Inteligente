@@ -37,6 +37,20 @@ services:
       - "traefik.http.middlewares.galpao-login-limite.ratelimit.period=1m"
       - "traefik.http.middlewares.galpao-login-limite.ratelimit.burst=5"
 
+  # painel estático em /, com prioridade abaixo da API (100)
+  painel:
+    networks:
+      - default
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_REDE:-gestto_gestto-network}"
+      - "traefik.http.services.galpao-painel.loadbalancer.server.port=80"
+      - "traefik.http.routers.galpao-painel.rule=Host(`${DOMINIO:?defina DOMINIO no .env}`)"
+      - "traefik.http.routers.galpao-painel.entrypoints=websecure"
+      - "traefik.http.routers.galpao-painel.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.galpao-painel.priority=10"
+
 networks:
   traefik:
     name: ${TRAEFIK_REDE:-gestto_gestto-network}

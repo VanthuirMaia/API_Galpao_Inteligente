@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar - Galpão Inteligente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body class="pagina-login">
+  <main class="login">
+    <h1>Galpão Inteligente</h1>
+    <p class="sub">Monitoramento de conforto térmico</p>
+    <form id="form-login" novalidate>
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email" autocomplete="username" required>
+      <label for="senha">Senha</label>
+      <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+      <p id="erro" class="msg erro" role="alert" hidden></p>
+      <button id="entrar" type="submit" class="botao">Entrar</button>
+    </form>
+  </main>
+  <footer id="rodape" class="rodape"></footer>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

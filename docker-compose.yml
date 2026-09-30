@@ -37,5 +37,15 @@ services:
     logging: *logging
     restart: unless-stopped
 
+  painel:
+    image: nginx:alpine
+    volumes:
+      - ./painel:/usr/share/nginx/html:ro
+      - ./nginx/painel.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+    logging: *logging
+    restart: unless-stopped
+
 volumes:
   mosquitto_data:

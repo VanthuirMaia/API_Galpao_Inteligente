@@ -24,11 +24,16 @@ services:
   api:
     environment:
       DATABASE_URL_API: postgresql://galpao:galpao_dev@postgres:5432/galpao
-      ROOT_PATH: ""
+      # o nginx do painel publica a API em /api (http://localhost:8080/api/docs)
+      ROOT_PATH: /api
     ports:
       - "8000:8000"
     depends_on:
       - postgres
+
+  painel:
+    ports:
+      - "8080:80"
 
 volumes:
   postgres_data:
