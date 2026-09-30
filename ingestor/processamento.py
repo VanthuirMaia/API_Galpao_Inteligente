@@ -23,12 +23,14 @@ def ativos_em_cache(conn: psycopg.Connection, cache: dict, agora: datetime, ttl_
     return cache["ids"]
 
 
-def processar_mensagem(conn: psycopg.Connection, cache: dict, topico: str, dados: bytes, agora: datetime) -> str:
+def processar_mensagem(
+    conn: psycopg.Connection, cache: dict, topico: str, dados: bytes, agora: datetime, ttl_s: int = 300
+) -> str:
     """Valida, calcula e grava. Retorna "gravada", "duplicada" ou "rejeitada:<motivo>".
 
     Erros de banco sobem para quem chamou (a reconexão é do main).
     """
-    ativos = ativos_em_cache(conn, cache, agora)
+    ativos = ativos_em_cache(conn, cache, agora, ttl_s)
     leitura, motivo = validar(topico, dados, ativos, agora)
     if motivo is not None:
         registrar_erro(conn, topico, dados, motivo)

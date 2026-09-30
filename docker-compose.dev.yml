@@ -1,0 +1,24 @@
+# Overlay de desenvolvimento: sobe um Postgres local.
+# Uso: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: galpao
+      POSTGRES_PASSWORD: galpao_dev
+      POSTGRES_DB: galpao
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  ingestor:
+    environment:
+      DATABASE_URL: postgresql://galpao:galpao_dev@postgres:5432/galpao
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

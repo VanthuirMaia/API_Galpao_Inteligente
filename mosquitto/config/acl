@@ -1,0 +1,6 @@
+# ingestor lê as leituras de todos os dispositivos
+user ingestor
+topic read galpao/+/leituras
+
+# cada ESP só publica no próprio tópico (usuário MQTT = device_id)
+pattern write galpao/%u/leituras
