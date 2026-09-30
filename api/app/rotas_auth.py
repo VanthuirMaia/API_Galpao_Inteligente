@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from app.deps import get_conn, usuario_atual
-from app.seguranca import HASH_FALSO, criar_token, verificar_senha
+from app.modelos import SenhaAlterarIn
+from app.seguranca import HASH_FALSO, criar_token, hash_senha, verificar_senha
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -52,3 +53,17 @@ def login(form: OAuth2PasswordRequestForm = Depends(), conn=Depends(get_conn)):
 @router.get("/me", response_model=UsuarioOut)
 def me(usuario: dict = Depends(usuario_atual)):
     return usuario
+
+
+@router.post("/senha", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+def trocar_senha(dados: SenhaAlterarIn, usuario: dict = Depends(usuario_atual), conn=Depends(get_conn)):
+    """Qualquer usuário logado troca a própria senha."""
+    atual = conn.execute("SELECT senha_hash FROM galpao.usuarios WHERE id = %s", (usuario["id"],)).fetchone()
+    if not verificar_senha(dados.senha_atual, atual["senha_hash"]):
+        # 400 e não 401: o token é válido, o erro está no corpo
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "senha atual incorreta")
+    conn.execute(
+        "UPDATE galpao.usuarios SET senha_hash = %s WHERE id = %s",
+        (hash_senha(dados.senha_nova), usuario["id"]),
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
