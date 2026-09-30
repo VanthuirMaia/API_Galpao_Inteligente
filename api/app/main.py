@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     app.state.pool.close()
 
 
-app = FastAPI(title="Galpão Inteligente - API", lifespan=lifespan)
+app = FastAPI(title="Galpão Inteligente - API", lifespan=lifespan, root_path=config.root_path())
 
 origens = config.cors_origins()
 if origens:

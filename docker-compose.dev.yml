@@ -10,13 +10,23 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./db/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      # aplica 001..004 em ordem na criação do volume
+      - ./db:/docker-entrypoint-initdb.d:ro
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
   ingestor:
     environment:
       DATABASE_URL: postgresql://galpao:galpao_dev@postgres:5432/galpao
+    depends_on:
+      - postgres
+
+  api:
+    environment:
+      DATABASE_URL_API: postgresql://galpao:galpao_dev@postgres:5432/galpao
+      ROOT_PATH: ""
+    ports:
+      - "8000:8000"
     depends_on:
       - postgres
 

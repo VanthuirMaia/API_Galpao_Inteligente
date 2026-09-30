@@ -1,6 +1,7 @@
 """Cria o primeiro usuário admin da API.
 
-Uso: DATABASE_URL=postgresql://galpao_api:SENHA@localhost:5432/galpao python scripts/criar_admin.py
+Uso: DATABASE_URL_API=postgresql://galpao_api:SENHA@localhost:5432/galpao python scripts/criar_admin.py
+(aceita também DATABASE_URL)
 Pede email, nome e senha (duas vezes) no terminal. Se o email já existir, avisa e sai sem alterar.
 """
 import getpass
@@ -17,9 +18,9 @@ SENHA_MIN = 10
 
 
 def main() -> None:
-    url = os.environ.get("DATABASE_URL")
+    url = os.environ.get("DATABASE_URL_API") or os.environ.get("DATABASE_URL")
     if not url:
-        sys.exit("DATABASE_URL não definida")
+        sys.exit("DATABASE_URL_API (ou DATABASE_URL) não definida")
 
     email = input("Email: ").strip().lower()
     nome = input("Nome: ").strip()

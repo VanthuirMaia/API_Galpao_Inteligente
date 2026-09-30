@@ -4,10 +4,16 @@ JWT_SECRET_MIN = 32
 
 
 def database_url() -> str:
-    url = os.environ.get("DATABASE_URL")
+    """DATABASE_URL_API tem prioridade: API e ingestor compartilham o mesmo .env e usam roles diferentes."""
+    url = os.environ.get("DATABASE_URL_API") or os.environ.get("DATABASE_URL")
     if not url:
-        raise RuntimeError("DATABASE_URL não definida")
+        raise RuntimeError("DATABASE_URL_API (ou DATABASE_URL) não definida")
     return url
+
+
+def root_path() -> str:
+    """Prefixo onde o proxy publica a API (ex.: /api). O proxy remove o prefixo antes de repassar."""
+    return os.environ.get("ROOT_PATH", "")
 
 
 def jwt_secret() -> str:

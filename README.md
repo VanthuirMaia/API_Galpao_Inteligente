@@ -55,4 +55,46 @@ O PostgreSQL roda direto no host (localhost:5432) e não é alterado pelo projet
 
 Nota: um ESP recém-cadastrado em `galpao.dispositivos` leva até `CACHE_TTL_S` segundos (padrão 300) para ser aceito, porque o ingestor mantém a lista de dispositivos ativos em cache.
 
+## Deploy da API na VPS
+
+A API roda em container, publicada pelo Traefik que já existe na VPS (rede externa `gestto_gestto-network`, certificado Let's Encrypt). Nada do Traefik nem de outros projetos é alterado: só este container ganha labels com prefixo `galpao-`. O Postgres do host é acessado por `host.docker.internal`. O painel (etapa futura) fica em `/` e a API em `/api`. Rode na raiz do repositório.
+
+1. Atualizar o código:
+   ```
+   git pull
+   ```
+2. Aplicar `003` e `004` no banco `galpao` (como `postgres`; a 004 faz os usuários já logados precisarem entrar de novo):
+   ```
+   cat db/003_usuarios_api.sql db/004_faixas_itgu.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
+   ```
+3. Definir a senha da role `galpao_api` e guardá-la em `/root/galpao_senhas.txt`:
+   ```
+   umask 077; p=$(openssl rand -hex 32); sudo -u postgres psql -d galpao -qc "ALTER ROLE galpao_api PASSWORD '$p'" && echo "galpao_api: $p" >> /root/galpao_senhas.txt
+   ```
+4. Verificar as permissões (troque `SENHA_ING` e `SENHA_API`; roda num container Python com `--network host`, pois o Postgres está no host):
+   ```
+   docker run --rm --network host -v "$PWD:/app" -w /app python:3.12-slim sh -c "pip install -q 'psycopg[binary]' && python scripts/verificar_permissoes.py --ingestor postgresql://galpao_ingestor:SENHA_ING@localhost:5432/galpao --api postgresql://galpao_api:SENHA_API@localhost:5432/galpao"
+   ```
+5. Acrescentar as variáveis novas ao `.env` e preenchê-las (`DOMINIO`, `DATABASE_URL_API` com a senha do passo 3, `JWT_SECRET` com `openssl rand -hex 32`):
+   ```
+   grep -E '^(DOMINIO|TRAEFIK_REDE|ROOT_PATH|DATABASE_URL_API|JWT_SECRET|JWT_EXPIRA_MIN|CORS_ORIGINS)=' .env.prod.example >> .env && nano .env
+   ```
+6. Subir só a API:
+   ```
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build api
+   ```
+7. Criar o primeiro admin (container temporário com a imagem da API; o `-l traefik.enable=false` impede o Traefik de rotear para ele):
+   ```
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm --no-deps -l traefik.enable=false -e PYTHONPATH=/srv -v "$PWD/scripts:/scripts:ro" api python /scripts/criar_admin.py
+   ```
+8. Testar:
+   ```
+   curl https://SEU_DOMINIO/api/saude
+   ```
+
+Notas:
+- Trocar de domínio = criar o novo registro DNS + mudar `DOMINIO` no `.env` + `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d api`.
+- O login (`/api/auth/login`) tem limite de 5 tentativas por minuto por IP (rajada de 5), aplicado pelo Traefik.
+- A documentação interativa fica em `https://SEU_DOMINIO/api/docs`.
+
 Projeto desenvolvido no Espaço CRIA da ETEGEC com apoio da Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco (FACEPE), processo ARC-0572-1.03/26.

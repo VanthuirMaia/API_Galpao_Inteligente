@@ -4,3 +4,40 @@ services:
   ingestor:
     # alcança o Postgres em localhost:5432 e o Mosquitto em 127.0.0.1:1883 (porta publicada no host)
     network_mode: host
+
+  # API publicada pelo Traefik já existente na VPS (rede externa). Nomes com prefixo "galpao-"
+  # para não colidir com os de outros projetos no mesmo Traefik.
+  api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # alcança o Postgres do host
+    networks:
+      - default
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      # o container tem 2 redes: sem isto o Traefik pode escolher a errada
+      - "traefik.docker.network=${TRAEFIK_REDE:-gestto_gestto-network}"
+      - "traefik.http.services.galpao-api.loadbalancer.server.port=8000"
+
+      # API em /api (o prefixo é removido antes de chegar ao FastAPI)
+      - "traefik.http.routers.galpao-api.rule=Host(`${DOMINIO:?defina DOMINIO no .env}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.galpao-api.entrypoints=websecure"
+      - "traefik.http.routers.galpao-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.galpao-api.priority=100"
+      - "traefik.http.routers.galpao-api.middlewares=galpao-api-strip"
+      - "traefik.http.middlewares.galpao-api-strip.stripprefix.prefixes=/api"
+
+      # login com limite de tentativas (por IP de origem); prioridade maior que a do router geral
+      - "traefik.http.routers.galpao-login.rule=Host(`${DOMINIO}`) && Path(`/api/auth/login`)"
+      - "traefik.http.routers.galpao-login.entrypoints=websecure"
+      - "traefik.http.routers.galpao-login.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.galpao-login.priority=200"
+      - "traefik.http.routers.galpao-login.middlewares=galpao-login-limite,galpao-api-strip"
+      - "traefik.http.middlewares.galpao-login-limite.ratelimit.average=5"
+      - "traefik.http.middlewares.galpao-login-limite.ratelimit.period=1m"
+      - "traefik.http.middlewares.galpao-login-limite.ratelimit.burst=5"
+
+networks:
+  traefik:
+    name: ${TRAEFIK_REDE:-gestto_gestto-network}
+    external: true
