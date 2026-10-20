@@ -1,28 +1,219 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Visão geral - Galpão Inteligente</title>
-  <link rel="stylesheet" href="css/estilo.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Nexar — Galpão Inteligente</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/nexar-icone.png">
+<meta name="theme-color" content="#073d2d">
+<link rel="stylesheet" href="css/nexar.css">
 </head>
 <body>
-  <header id="cabecalho" class="cabecalho"></header>
-  <main class="conteudo">
-    <div class="titulo-pagina">
-      <h1>Visão geral</h1>
-      <p id="atualizado" class="sub" aria-live="polite"></p>
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
+<section class="login" id="login" hidden>
+  <form class="login-card panel" id="form-login">
+    <div class="login-marca">
+      <img src="img/nexar-icone.png" alt="" width="112" height="112">
+      <div class="marca-nome">Nexar</div>
+      <p class="marca-slogan">Tecnologia que cuida do seu amanhã</p>
     </div>
-    <p id="aviso" class="msg aviso" role="status" hidden></p>
-    <p id="erro" class="msg erro" role="alert" hidden></p>
-    <p id="carregando" class="sub">Carregando…</p>
-    <section id="lista-ativos" class="grade-cards" aria-label="Dispositivos ativos"></section>
-    <details id="inativos" class="inativos" hidden>
-      <summary id="resumo-inativos"></summary>
-      <div id="lista-inativos" class="grade-cards"></div>
-    </details>
+    <h1>Entrar</h1>
+    <p class="page-intro">Entre para acompanhar o galpão.</p>
+    <label for="usuario">E-mail</label>
+    <input id="usuario" type="email" autocomplete="username" required>
+    <label for="senha">Senha</label>
+    <input id="senha" type="password" autocomplete="current-password" required>
+    <p class="login-erro" id="erro-login" role="alert"></p>
+    <button class="action-button" type="submit">ENTRAR</button>
+  </form>
+</section>
+<div class="app" id="app" hidden>
+  <aside class="sidebar" aria-label="Menu principal">
+    <div class="brand">
+      <img class="brand-mark" src="img/nexar-icone.png" alt="" width="52" height="52">
+      <div class="brand-texto">
+        <div class="brand-name">Nexar</div>
+        <div class="brand-slogan">Tecnologia que cuida do seu amanhã</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Páginas">
+      <button class="nav-button" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3z" stroke-linejoin="round"/></svg><span>Início</span></button>
+      <button class="nav-button" data-page="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg><span>Ver galpão</span></button>
+      <button class="nav-button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7M17 6h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Histórico</span></button>
+      <button class="nav-button" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.2 1-1.6 2.8-1.5-.5a8 8 0 0 1-1.6.9l-.3 1.6h-3.2l-.3-1.6a8 8 0 0 1-1.6-.9l-1.5.5-1.6-2.8 1.2-1a8 8 0 0 1 0-1.9l-1.2-1 1.6-2.8 1.5.5a8 8 0 0 1 1.6-.9l.3-1.6h3.2l.3 1.6a8 8 0 0 1 1.6.9l1.5-.5 1.6 2.8-1.2 1a8 8 0 0 1 0 1.9Z" transform="translate(-1 -1) scale(1.08)"/></svg><span>Configurar</span></button>
+    </nav>
+    <nav class="nav" aria-label="Outras páginas">
+      <p class="nav-titulo">Mais</p>
+      <a class="nav-button" href="diagnostico.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Diagnóstico</span></a>
+      <a class="nav-button" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg><span>Minha conta</span></a>
+      <a class="nav-button so-admin" hidden href="dispositivos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4" stroke-linecap="round"/></svg><span>Dispositivos</span></a>
+      <a class="nav-button so-admin" hidden href="faixas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg><span>Faixas de ITGU</span></a>
+      <a class="nav-button so-admin" hidden href="usuarios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M17 11a3 3 0 1 0 0-6" stroke-linecap="round"/></svg><span>Usuários</span></a>
+    </nav>
+    <div class="side-bottom">Leitura fácil<br>Feito para o dia a dia no campo</div>
+  </aside>
+  <main id="main" tabindex="-1">
+    <header class="topbar">
+      <div>
+        <h1 id="page-title">Galpão 01</h1>
+        <p class="top-subtitle" id="page-subtitle">Veja aqui se está tudo bem com as aves.</p>
+      </div>
+      <div class="top-actions">
+        <label class="seletor" for="dispositivo" id="rotulo-dispositivo" hidden>Galpão<select id="dispositivo"></select></label>
+        <button class="theme-button" id="theme-toggle" aria-pressed="false" aria-label="Ativar tema escuro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" stroke-linejoin="round"/></svg>
+          <span id="theme-label">TEMA ESCURO</span>
+        </button>
+      </div>
+    </header>
+    <section class="page active" id="page-home" aria-labelledby="page-title">
+      <div class="summary caution" id="resumo" role="status" aria-live="polite">
+        <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>
+        <div><strong id="resumo-titulo">CARREGANDO…</strong><p id="resumo-texto">Buscando as leituras mais recentes.</p></div>
+      </div>
+
+      <div class="metrics" aria-label="Leituras atuais">
+        <article class="metric sem-dado" id="m-temp">
+          <div class="metric-head">
+            <svg class="metric-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 7a5 5 0 0 1 10 0v21a10 10 0 1 1-10 0V7Z"/><path d="M25 12v20" stroke-linecap="round"/><path d="M34 5c4 2 7 6 7 11M35 2l1 5 5-1" stroke-linecap="round"/></svg>
+            <h2>Temperatura dentro do galpão</h2>
+          </div>
+          <p class="value" data-campo="valor">--</p>
+          <span class="pill" data-campo="pill">Aguardando</span>
+          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="metric-note" data-campo="nota">&nbsp;</p>
+        </article>
+
+        <article class="metric sem-dado" id="m-umid">
+          <div class="metric-head">
+            <svg class="metric-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M4 22 24 5l20 17M10 20v23h28V20M19 43V29h10v14" stroke-linejoin="round"/><path d="M33 4v9m-4-4h8" stroke-linecap="round"/></svg>
+            <h2>Umidade do ar</h2>
+          </div>
+          <p class="value" data-campo="valor">--</p>
+          <span class="pill" data-campo="pill">Aguardando</span>
+          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="metric-note" data-campo="nota">&nbsp;</p>
+        </article>
+
+        <article class="metric sem-dado" id="m-ext">
+          <div class="metric-head">
+            <svg class="metric-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 8a4 4 0 0 1 8 0v21a9 9 0 1 1-8 0V8Z"/><path d="M24 14v18" stroke-linecap="round"/><path d="M35 17h8m-4-4v8" stroke-linecap="round"/></svg>
+            <h2>Temperatura de fora</h2>
+          </div>
+          <p class="value" data-campo="valor">--</p>
+          <span class="pill" data-campo="pill">Aguardando</span>
+          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="metric-note" data-campo="nota">&nbsp;</p>
+        </article>
+
+        <article class="metric sem-dado" id="m-calor">
+          <div class="metric-head">
+            <svg class="metric-icon" viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><path d="M8 25c0-7 5-13 12-14l4-7 5 3-2 5c5 2 8 6 9 12l6 3-6 3c-1 7-8 12-16 12C11 42 5 36 5 29l3-4Zm10-7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M4 25 1 20l7 2m30 0 4-4 2 7"/></svg>
+            <h2>Calor para as aves</h2>
+          </div>
+          <p class="value" data-campo="valor">--</p>
+          <span class="pill" data-campo="pill">Aguardando</span>
+          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="metric-note" data-campo="nota">&nbsp;</p>
+        </article>
+      </div>
+
+      <section class="actions-panel" aria-labelledby="quick-title">
+        <h2 class="section-heading" id="quick-title">O que deseja fazer?</h2>
+        <div class="quick-actions">
+          <button class="action-button" data-goto="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m2 11 10-8 10 8M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg>VER GALPÃO</button>
+          <button class="action-button secondary" data-goto="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>VER HISTÓRICO</button>
+          <button class="action-button secondary" data-goto="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>VER ALERTAS</button>
+        </div>
+      </section>
+      <p class="footnote" id="status">Conectando…</p>
+    </section>
+
+    <section class="page" id="page-barn" aria-labelledby="page-title" hidden>
+      <p class="page-intro">Veja onde ficam as áreas do galpão e confira os avisos.</p>
+      <div class="barn-layout">
+        <section class="panel">
+          <h2>Visão do galpão</h2>
+          <svg class="barn-illustration" viewBox="0 0 680 420" role="img" aria-label="Desenho ilustrativo do galpão visto de cima, com quatro ventiladores e duas leituras destacadas">
+            <rect x="54" y="45" width="572" height="326" rx="22" fill="#d5e5d9" stroke="#49775f" stroke-width="7"/>
+            <rect x="76" y="67" width="528" height="282" rx="12" fill="#f8fbf8" stroke="#275d45" stroke-width="5"/>
+            <rect x="95" y="84" width="490" height="248" rx="8" fill="#dcebe0" stroke="#82b99a" stroke-width="3"/>
+            <g fill="#fff" stroke="#366c51" stroke-width="3">
+              <circle cx="142" cy="122" r="29"/><circle cx="538" cy="122" r="29"/><circle cx="142" cy="294" r="29"/><circle cx="538" cy="294" r="29"/>
+            </g>
+            <g fill="#44835f"><path d="M142 98q20 7 10 24t-10 0q-10 15-12 0t12-24ZM118 122q7-20 24-10t0 10q15 10 0 12t-24-12ZM142 146q-20-7-10-24t10 0q10-15 12 0t-12 24ZM166 122q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/><path d="M538 98q20 7 10 24t-10 0q-10 15-12 0t12-24ZM514 122q7-20 24-10t0 10q15 10 0 12t-24-12ZM538 146q-20-7-10-24t10 0q10-15 12 0t-12 24ZM562 122q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/><path d="M142 270q20 7 10 24t-10 0q-10 15-12 0t12-24ZM118 294q7-20 24-10t0 10q15 10 0 12t-24-12ZM142 318q-20-7-10-24t10 0q10-15 12 0t-12 24ZM166 294q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/><path d="M538 270q20 7 10 24t-10 0q-10 15-12 0t12-24ZM514 294q7-20 24-10t0 10q15 10 0 12t-24-12ZM538 318q-20-7-10-24t10 0q10-15 12 0t-12 24ZM562 294q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/></g>
+            <g fill="#b3dfc1"><circle cx="208" cy="109" r="5"/><circle cx="234" cy="109" r="5"/><circle cx="260" cy="109" r="5"/><circle cx="286" cy="109" r="5"/><circle cx="312" cy="109" r="5"/><circle cx="338" cy="109" r="5"/><circle cx="364" cy="109" r="5"/><circle cx="390" cy="109" r="5"/><circle cx="416" cy="109" r="5"/><circle cx="442" cy="109" r="5"/><circle cx="468" cy="109" r="5"/></g>
+            <g class="caixa caution" id="caixa-temp"><rect x="218" y="155" width="244" height="70" rx="15"/><text x="340" y="183" font-size="19" text-anchor="middle">TEMPERATURA</text><text id="svg-temp" x="340" y="211" font-size="30" text-anchor="middle">-- °C</text></g>
+            <g class="caixa caution" id="caixa-umid"><rect x="236" y="244" width="208" height="60" rx="15"/><text x="340" y="267" font-size="16" text-anchor="middle">UMIDADE</text><text id="svg-umid" x="340" y="291" font-size="26" text-anchor="middle">--%</text></g>
+          </svg>
+        </section>
+        <aside class="panel">
+          <h2>O que verificar</h2>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-dot vermelho"></span><div><strong>Vermelho</strong><p>Agir agora: confira a ventilação.</p></div></div>
+            <div class="legend-item"><span class="legend-dot amarelo"></span><div><strong>Amarelo</strong><p>Atenção: acompanhe de perto.</p></div></div>
+            <div class="legend-item"><span class="legend-dot verde"></span><div><strong>Verde</strong><p>Tudo bem: pode manter como está.</p></div></div>
+          </div>
+          <button class="action-button largo" data-goto="alerts">VER TODOS OS ALERTAS</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="page" id="page-history" aria-labelledby="page-title" hidden>
+      <p class="page-intro">Veja como as leituras mudaram nas últimas 24 horas (médias de 5 em 5 minutos).</p>
+      <section class="panel">
+        <h2>Temperatura durante o dia</h2>
+        <div class="chart-wrap"><p class="chart-vazio" id="grafico-vazio" hidden></p><svg class="chart" id="grafico" viewBox="0 0 760 390" role="img" aria-label="Gráfico da temperatura dentro e fora do galpão nas últimas 24 horas"></svg></div>
+        <div class="legend duas-colunas">
+          <div class="legend-item"><span class="legend-dot serie-dentro"></span><div><strong>Dentro do galpão</strong></div></div>
+          <div class="legend-item"><span class="legend-dot serie-fora"></span><div><strong>Temperatura de fora</strong></div></div>
+        </div>
+        <div class="table-wrap"><table><caption class="visually-hidden">Resumo das últimas 24 horas</caption><thead><tr><th>Leitura</th><th>Mínima</th><th>Média</th><th>Máxima</th></tr></thead><tbody id="tabela"></tbody></table></div>
+      </section>
+    </section>
+
+    <section class="page" id="page-alerts" aria-labelledby="page-title" hidden>
+      <p class="page-intro">Veja primeiro o que precisa de atenção.</p>
+      <div class="alert-list" id="lista-alertas"></div>
+      <p class="footnote">As orientações são gerais. Siga os procedimentos de segurança do seu equipamento.</p>
+    </section>
+
+    <section class="page" id="page-settings" aria-labelledby="page-title" hidden>
+      <p class="page-intro">Ajuste a tela para ficar confortável para você.</p>
+      <section class="panel">
+        <h2>Leitura da tela</h2>
+        <div class="setting-row"><div><strong>Tamanho das letras</strong><br><span>Deixe os números e textos maiores.</span></div><div class="setting-controls"><button class="small-button" id="font-down" aria-label="Diminuir o tamanho das letras">A−</button><button class="small-button" id="font-up" aria-label="Aumentar o tamanho das letras">A+</button><button class="small-button" id="font-reset">Normal</button></div></div>
+        <div class="setting-row"><div><strong>Tema da tela</strong><br><span>Use cores escuras em ambientes com pouca luz.</span></div><div class="setting-controls"><button class="small-button" id="theme-light">CLARO</button><button class="small-button" id="theme-dark">ESCURO</button></div></div>
+      </section>
+      <section class="panel">
+        <h2>Sua conta</h2>
+        <p class="nota-usuario" id="usuario-logado"></p>
+        <button class="small-button" id="sair">SAIR DA CONTA</button>
+      </section>
+    </section>
+
+    <!-- Marcas parceiras servidas localmente (img/parceiros): a CSP do painel só aceita imagens do próprio site. -->
+    <footer class="brand-footer" aria-label="Logotipos das instituições parceiras">
+      <div class="brand-logo see">
+        <img src="img/parceiros/see.png" alt="Secretaria de Educação de Pernambuco (SEE-PE)" loading="lazy" decoding="async">
+      </div>
+      <div class="brand-logo secti">
+        <img src="img/parceiros/secti.png" alt="Secretaria de Ciência, Tecnologia e Inovação de Pernambuco (SECTI-PE)" loading="lazy" decoding="async">
+      </div>
+      <div class="brand-logo ete">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iNzYiIHZpZXdCb3g9IjAgMCAyMjAgNzYiPgogICAgICAgICAgPHJlY3QgeD0iMzIiIHk9IjUiIHdpZHRoPSIxNTYiIGhlaWdodD0iNDMiIHJ4PSI3IiBmaWxsPSIjMDc1NmEyIi8+CiAgICAgICAgICA8cmVjdCB4PSIxOCIgeT0iOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjgiIHJ4PSIxIiBmaWxsPSIjZWZiZjI0Ii8+CiAgICAgICAgICA8cmVjdCB4PSIxOCIgeT0iMjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSI4IiByeD0iMSIgZmlsbD0iIzIwYTM1YiIvPgogICAgICAgICAgPHJlY3QgeD0iMTgiIHk9IjM1IiB3aWR0aD0iMTAiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiNkOTM2MzYiLz4KICAgICAgICAgIDxyZWN0IHg9IjE5MiIgeT0iOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjgiIHJ4PSIxIiBmaWxsPSIjZWZiZjI0Ii8+CiAgICAgICAgICA8cmVjdCB4PSIxOTIiIHk9IjIyIiB3aWR0aD0iMTAiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMyMGEzNWIiLz4KICAgICAgICAgIDxyZWN0IHg9IjE5MiIgeT0iMzUiIHdpZHRoPSIxMCIgaGVpZ2h0PSI4IiByeD0iMSIgZmlsbD0iI2Q5MzYzNiIvPgogICAgICAgICAgPHRleHQgeD0iMTEwIiB5PSIzOCIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM0IiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FVEU8L3RleHQ+CiAgICAgICAgICA8dGV4dCB4PSIxMTAiIHk9IjU5IiBmaWxsPSIjMjQ0MDVhIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSI4MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkVTQ09MQSBUw4lDTklDQSBFU1RBRFVBTDwvdGV4dD4KICAgICAgICAgIDx0ZXh0IHg9IjExMCIgeT0iNzAiIGZpbGw9IiMyNDQwNWEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI4LjUiIGZvbnQtd2VpZ2h0PSI3MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkdPVkVSTkFET1IgRURVQVJETyBDQU1QT1M8L3RleHQ+CiAgICAgICAgPC9zdmc+" alt="Logotipo ETE — Escola Técnica Estadual Governador Eduardo Campos" loading="eager" decoding="async">
+      </div>
+      <div class="brand-logo facepe">
+        <img src="img/parceiros/facepe.png" alt="Fundação de Amparo à Ciência e Tecnologia de Pernambuco (FACEPE)" loading="lazy" decoding="async">
+      </div>
+      <div class="brand-logo agil">
+        <img src="img/parceiros/agil.png" alt="Agil Pernambuco" loading="lazy" decoding="async">
+      </div>
+    </footer>
   </main>
-  <footer id="rodape" class="rodape"></footer>
-  <script type="module" src="js/visao_geral.js"></script>
+</div>
+<script type="module" src="js/nexar.js"></script>
 </body>
 </html>

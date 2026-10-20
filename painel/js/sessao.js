@@ -48,6 +48,11 @@ export function caminhoInternoSeguro(caminho) {
 
 export function irParaLogin() {
   if (location.pathname.endsWith("/login.html")) return; // já está no login: evita laço
+  // a página principal (Nexar) tem o login embutido: sem sessão, recarregar mostra o formulário
+  if (document.getElementById("login")) {
+    location.reload();
+    return;
+  }
   const volta = encodeURIComponent(location.pathname + location.search);
   location.replace("login.html?volta=" + volta);
 }
