@@ -7,7 +7,7 @@
 <title>Nexar — Galpão Inteligente</title>
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="apple-touch-icon" href="img/nexar-icone.png">
-<meta name="theme-color" content="#073d2d">
+<meta name="theme-color" content="#0a1114">
 <link rel="stylesheet" href="css/nexar.css">
 </head>
 <body>
@@ -39,95 +39,147 @@
       </div>
     </div>
     <nav class="nav nav-principal" aria-label="Páginas">
-      <button class="nav-button" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3z" stroke-linejoin="round"/></svg><span>Início</span></button>
-      <button class="nav-button" data-page="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg><span>Ver galpão</span></button>
-      <button class="nav-button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7M17 6h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Histórico</span></button>
-      <button class="nav-button" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.2 1-1.6 2.8-1.5-.5a8 8 0 0 1-1.6.9l-.3 1.6h-3.2l-.3-1.6a8 8 0 0 1-1.6-.9l-1.5.5-1.6-2.8 1.2-1a8 8 0 0 1 0-1.9l-1.2-1 1.6-2.8 1.5.5a8 8 0 0 1 1.6-.9l.3-1.6h3.2l.3 1.6a8 8 0 0 1 1.6.9l1.5-.5 1.6 2.8-1.2 1a8 8 0 0 1 0 1.9Z" transform="translate(-1 -1) scale(1.08)"/></svg><span>Configurar</span></button>
+      <button class="nav-button" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3z" stroke-linejoin="round"/></svg><span>Início</span></button>
+      <button class="nav-button" data-page="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg><span>Ver galpão</span></button>
+      <button class="nav-button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7M17 6h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Histórico</span></button>
+      <button class="nav-button" data-page="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>Alertas</span></button>
+      <button class="nav-button" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.2 1-1.6 2.8-1.5-.5a8 8 0 0 1-1.6.9l-.3 1.6h-3.2l-.3-1.6a8 8 0 0 1-1.6-.9l-1.5.5-1.6-2.8 1.2-1a8 8 0 0 1 0-1.9l-1.2-1 1.6-2.8 1.5.5a8 8 0 0 1 1.6-.9l.3-1.6h3.2l.3 1.6a8 8 0 0 1 1.6.9l1.5-.5 1.6 2.8-1.2 1a8 8 0 0 1 0 1.9Z" transform="translate(-1 -1) scale(1.08)"/></svg><span>Configurações</span></button>
     </nav>
     <nav class="nav nav-mais" aria-label="Outras páginas">
       <p class="nav-titulo">Mais</p>
-      <a class="nav-button" href="diagnostico.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Diagnóstico</span></a>
-      <a class="nav-button" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg><span>Minha conta</span></a>
-      <a class="nav-button so-admin" hidden href="dispositivos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4" stroke-linecap="round"/></svg><span>Dispositivos</span></a>
-      <a class="nav-button so-admin" hidden href="faixas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg><span>Faixas de ITGU</span></a>
-      <a class="nav-button so-admin" hidden href="usuarios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M17 11a3 3 0 1 0 0-6" stroke-linecap="round"/></svg><span>Usuários</span></a>
+      <a class="nav-button" href="diagnostico.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Diagnóstico</span></a>
+      <a class="nav-button" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg><span>Minha conta</span></a>
+      <a class="nav-button so-admin" hidden href="dispositivos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4" stroke-linecap="round"/></svg><span>Dispositivos</span></a>
+      <a class="nav-button so-admin" hidden href="faixas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg><span>Faixas de ITGU</span></a>
+      <a class="nav-button so-admin" hidden href="usuarios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M17 11a3 3 0 1 0 0-6" stroke-linecap="round"/></svg><span>Usuários</span></a>
     </nav>
-    <div class="side-bottom">Leitura fácil<br>Feito para o dia a dia no campo</div>
+    <div class="side-bottom">Bem-estar das aves,<br>mais produtividade.</div>
   </aside>
   <main id="main" tabindex="-1">
     <header class="topbar">
-      <div>
-        <h1 id="page-title">Galpão 01</h1>
-        <p class="top-subtitle" id="page-subtitle">Veja aqui se está tudo bem com as aves.</p>
+      <div class="topo-titulo">
+        <h1 id="page-title">Monitoramento do galpão</h1>
+        <p class="top-subtitle" id="page-subtitle">Acompanhe as condições das aves.</p>
       </div>
-      <div class="top-actions">
-        <label class="seletor" for="dispositivo" id="rotulo-dispositivo" hidden>Galpão<select id="dispositivo"></select></label>
-        <button class="theme-button" id="theme-toggle" aria-pressed="false" aria-label="Ativar tema escuro">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" stroke-linejoin="round"/></svg>
-          <span id="theme-label">Tema escuro</span>
-        </button>
+      <div class="topo-info">
+        <label class="chip" for="dispositivo" id="rotulo-dispositivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg><span class="chip-texto"><span class="chip-rotulo">Galpão</span><select id="dispositivo"></select></span></label>
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="chip-texto"><span class="chip-rotulo">Data</span><strong id="topo-data">--/--/----</strong></span></div>
+        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span class="chip-texto"><span class="chip-rotulo">Horário</span><strong id="topo-hora">--:--</strong></span></div>
       </div>
-    </header>
-    <section class="page active" id="page-home" aria-labelledby="page-title">
-      <div class="summary caution" id="resumo" role="status" aria-live="polite">
-        <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>
+      <div class="status-badge caution" id="resumo" role="status" aria-live="polite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="summary-icon"><circle cx="12" cy="12" r="9.5"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
         <div><strong id="resumo-titulo">Carregando…</strong><p id="resumo-texto">Buscando as leituras mais recentes.</p></div>
       </div>
-
-      <div class="metrics" aria-label="Leituras atuais">
-        <article class="metric sem-dado" id="m-temp">
-          <div class="metric-head">
-            <svg class="metric-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 7a5 5 0 0 1 10 0v21a10 10 0 1 1-10 0V7Z"/><path d="M25 12v20" stroke-linecap="round"/><path d="M34 5c4 2 7 6 7 11M35 2l1 5 5-1" stroke-linecap="round"/></svg>
-            <h2>Temperatura dentro do galpão</h2>
+      <button class="theme-button" id="theme-toggle" aria-pressed="false" aria-label="Ativar tema escuro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" stroke-linejoin="round"/></svg>
+        <span id="theme-label">Tema claro</span>
+      </button>
+    </header>
+    <section class="page active" id="page-home" aria-labelledby="page-title">
+      <div class="home-grid">
+        <div class="home-main">
+          <div class="banner">
+            <p class="banner-frase">A tecnologia a favor<br>do bem-estar animal.</p>
           </div>
-          <p class="value" data-campo="valor">--</p>
-          <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
-          <p class="metric-note" data-campo="nota">&nbsp;</p>
-        </article>
 
-        <article class="metric sem-dado" id="m-umid">
-          <div class="metric-head">
-            <svg class="metric-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M4 22 24 5l20 17M10 20v23h28V20M19 43V29h10v14" stroke-linejoin="round"/><path d="M33 4v9m-4-4h8" stroke-linecap="round"/></svg>
-            <h2>Umidade do ar</h2>
+          <div class="duo">
+            <article class="leitura leitura-temp sem-dado" id="m-temp" aria-label="Temperatura">
+              <div class="leitura-topo">
+                <span class="leitura-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0Z"/><path d="M12 9v7"/></svg></span>
+                <div><h2>Temperatura</h2><p class="leitura-sub">Dentro do galpão</p></div>
+              </div>
+              <div class="leitura-corpo">
+                <div class="leitura-valor">
+                  <p class="value" data-campo="valor">--</p>
+                  <span class="pill" data-campo="pill">Aguardando</span>
+                </div>
+                <dl class="leitura-lado">
+                  <div><dt>Faixa recomendada (ITGU)</dt><dd data-campo="faixa">--</dd></div>
+                  <div><dt>Temperatura de fora</dt><dd data-campo="extra">--</dd></div>
+                </dl>
+              </div>
+              <div class="escala" data-campo="escala" hidden>
+                <div class="escala-barra" data-campo="barra"><span class="escala-marca" data-campo="marca"></span></div>
+                <p class="escala-legenda" data-campo="legenda"></p>
+              </div>
+              <p class="action-text" data-campo="acao">Aguardando leitura.</p>
+              <p class="metric-note" data-campo="nota">&nbsp;</p>
+            </article>
+
+            <article class="leitura leitura-umid sem-dado" id="m-umid" aria-label="Umidade relativa">
+              <div class="leitura-topo">
+                <span class="leitura-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></svg></span>
+                <div><h2>Umidade relativa</h2><p class="leitura-sub">Dentro do galpão</p></div>
+              </div>
+              <div class="leitura-corpo">
+                <div class="leitura-valor">
+                  <p class="value" data-campo="valor">--</p>
+                  <span class="pill" data-campo="pill">Aguardando</span>
+                </div>
+                <dl class="leitura-lado">
+                  <div><dt>Faixa recomendada</dt><dd data-campo="faixa">--</dd></div>
+                  <div><dt>Limites aceitáveis</dt><dd data-campo="extra">--</dd></div>
+                </dl>
+              </div>
+              <div class="escala" data-campo="escala" hidden>
+                <div class="escala-barra" data-campo="barra"><span class="escala-marca" data-campo="marca"></span></div>
+                <p class="escala-legenda" data-campo="legenda"></p>
+              </div>
+              <p class="action-text" data-campo="acao">Aguardando leitura.</p>
+              <p class="metric-note" data-campo="nota">&nbsp;</p>
+            </article>
           </div>
-          <p class="value" data-campo="valor">--</p>
-          <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
-          <p class="metric-note" data-campo="nota">&nbsp;</p>
-        </article>
 
-        <article class="metric sem-dado" id="m-ext">
-          <div class="metric-head">
-            <svg class="metric-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 8a4 4 0 0 1 8 0v21a9 9 0 1 1-8 0V8Z"/><path d="M24 14v18" stroke-linecap="round"/><path d="M35 17h8m-4-4v8" stroke-linecap="round"/></svg>
-            <h2>Temperatura de fora</h2>
+          <section class="panel painel-grafico" aria-labelledby="t-evolucao">
+            <div class="painel-cabeca">
+              <h2 id="t-evolucao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-6"/></svg>Evolução nas últimas 24 horas</h2>
+              <ul class="legenda-linhas">
+                <li><span class="traco temp"></span>Temperatura (°C)</li>
+                <li><span class="traco umid"></span>Umidade (%)</li>
+                <li><span class="traco fora"></span>Fora do galpão (°C)</li>
+              </ul>
+            </div>
+            <div class="chart-wrap"><p class="chart-vazio" id="grafico-home-vazio" hidden></p><svg class="chart" id="grafico-home" viewBox="0 0 760 300" role="img" aria-label="Gráfico de temperatura e umidade nas últimas 24 horas"></svg></div>
+          </section>
+
+          <div class="duo2">
+            <section class="panel" aria-labelledby="t-legenda">
+              <div class="painel-cabeca"><h2 id="t-legenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Legenda de alertas</h2></div>
+              <div class="legenda-cards">
+                <div class="lg verde"><span class="lg-dot"></span><strong>Verde</strong><span>Normal</span><small>Condições adequadas</small></div>
+                <div class="lg amarelo"><span class="lg-dot"></span><strong>Amarelo</strong><span>Atenção</span><small>Monitorar</small></div>
+                <div class="lg vermelho"><span class="lg-dot"></span><strong>Vermelho</strong><span>Crítico</span><small>Agir imediatamente</small></div>
+                <div class="lg cinza"><span class="lg-dot"></span><strong>Cinza</strong><span>Sem leitura</span><small>Verificar sensor</small></div>
+              </div>
+            </section>
+            <section class="panel" aria-labelledby="t-ativos">
+              <div class="painel-cabeca">
+                <h2 id="t-ativos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>Alertas ativos agora</h2>
+                <button class="link-botao" data-goto="alerts">Ver todos →</button>
+              </div>
+              <div class="table-wrap"><table class="tabela-alertas"><caption class="visually-hidden">Alertas ativos</caption><thead><tr><th>Hora</th><th>Parâmetro</th><th>Valor</th><th>Status</th></tr></thead><tbody id="tabela-alertas"></tbody></table></div>
+            </section>
           </div>
-          <p class="value" data-campo="valor">--</p>
-          <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
-          <p class="metric-note" data-campo="nota">&nbsp;</p>
-        </article>
-
-        <article class="metric sem-dado" id="m-calor">
-          <div class="metric-head">
-            <svg class="metric-icon" viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><path d="M8 25c0-7 5-13 12-14l4-7 5 3-2 5c5 2 8 6 9 12l6 3-6 3c-1 7-8 12-16 12C11 42 5 36 5 29l3-4Zm10-7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M4 25 1 20l7 2m30 0 4-4 2 7"/></svg>
-            <h2>Calor para as aves</h2>
-          </div>
-          <p class="value" data-campo="valor">--</p>
-          <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
-          <p class="metric-note" data-campo="nota">&nbsp;</p>
-        </article>
-      </div>
-
-      <section class="actions-panel" aria-labelledby="quick-title">
-        <h2 class="section-heading" id="quick-title">O que deseja fazer?</h2>
-        <div class="quick-actions">
-          <button class="action-button" data-goto="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m2 11 10-8 10 8M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg>Ver galpão</button>
-          <button class="action-button secondary" data-goto="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>Ver histórico</button>
-          <button class="action-button secondary" data-goto="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>Ver alertas</button>
         </div>
-      </section>
+
+        <aside class="home-side" aria-label="Situação geral">
+          <section class="panel painel-status">
+            <h2>Status geral do ambiente</h2>
+            <div class="anel caution" id="anel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="anel-icone"><path d="m6 12.5 4 4 8-9"/></svg>
+              <strong id="anel-texto">--</strong>
+            </div>
+            <p class="anel-desc" id="anel-desc">Buscando as leituras mais recentes.</p>
+            <dl class="info-lista">
+              <div><dt>Ambiente</dt><dd id="info-ambiente">--</dd></div>
+              <div><dt>Idade do lote</dt><dd id="info-idade">--</dd></div>
+              <div><dt>Faixa de ITGU</dt><dd id="info-faixa">--</dd></div>
+              <div><dt>ITGU atual</dt><dd id="info-itgu">--</dd></div>
+              <div><dt>Última leitura</dt><dd id="info-ultima">--</dd></div>
+            </dl>
+          </section>
+        </aside>
+      </div>
       <p class="footnote" id="status">Conectando…</p>
     </section>
 
@@ -155,6 +207,7 @@
             <div class="legend-item"><span class="legend-dot vermelho"></span><div><strong>Vermelho</strong><p>Agir agora: confira a ventilação.</p></div></div>
             <div class="legend-item"><span class="legend-dot amarelo"></span><div><strong>Amarelo</strong><p>Atenção: acompanhe de perto.</p></div></div>
             <div class="legend-item"><span class="legend-dot verde"></span><div><strong>Verde</strong><p>Tudo bem: pode manter como está.</p></div></div>
+            <div class="legend-item"><span class="legend-dot cinza"></span><div><strong>Cinza</strong><p>Sem leitura: verifique o sensor.</p></div></div>
           </div>
           <button class="action-button largo" data-goto="alerts">Ver todos os alertas</button>
         </aside>
@@ -164,12 +217,13 @@
     <section class="page" id="page-history" aria-labelledby="page-title" hidden>
       <p class="page-intro">Veja como as leituras mudaram nas últimas 24 horas (médias de 5 em 5 minutos).</p>
       <section class="panel">
-        <h2>Temperatura durante o dia</h2>
-        <div class="chart-wrap"><p class="chart-vazio" id="grafico-vazio" hidden></p><svg class="chart" id="grafico" viewBox="0 0 760 390" role="img" aria-label="Gráfico da temperatura dentro e fora do galpão nas últimas 24 horas"></svg></div>
-        <div class="legend duas-colunas">
-          <div class="legend-item"><span class="legend-dot serie-dentro"></span><div><strong>Dentro do galpão</strong></div></div>
-          <div class="legend-item"><span class="legend-dot serie-fora"></span><div><strong>Temperatura de fora</strong></div></div>
-        </div>
+        <h2>Temperatura e umidade durante o dia</h2>
+        <div class="chart-wrap"><p class="chart-vazio" id="grafico-vazio" hidden></p><svg class="chart" id="grafico" viewBox="0 0 760 340" role="img" aria-label="Gráfico de temperatura e umidade nas últimas 24 horas"></svg></div>
+        <ul class="legenda-linhas legenda-linhas-baixo">
+          <li><span class="traco temp"></span>Temperatura (°C)</li>
+          <li><span class="traco umid"></span>Umidade (%)</li>
+          <li><span class="traco fora"></span>Fora do galpão (°C)</li>
+        </ul>
         <div class="table-wrap"><table><caption class="visually-hidden">Resumo das últimas 24 horas</caption><thead><tr><th>Leitura</th><th>Mínima</th><th>Média</th><th>Máxima</th></tr></thead><tbody id="tabela"></tbody></table></div>
       </section>
     </section>
