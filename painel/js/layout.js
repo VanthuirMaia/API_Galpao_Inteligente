@@ -125,7 +125,7 @@ export function montarLayout() {
   logo.width = 52;
   logo.height = 52;
   const texto = el("div", "brand-texto");
-  texto.append(el("div", "brand-name", "Nexar"), el("div", "brand-slogan", "Tecnologia que cuida do seu amanhã"));
+  texto.append(el("div", "brand-name", "Nexar"));
   marca.append(logo, texto);
 
   const principal = el("nav", "nav nav-principal");
