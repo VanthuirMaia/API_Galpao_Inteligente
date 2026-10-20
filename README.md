@@ -115,7 +115,7 @@ O painel é um site estático servido por um container nginx, atrás do mesmo Tr
    ```
 
 Notas:
-- Como o painel é estático (sem build), uma atualização de HTML, CSS ou JS só precisa de `git pull`: os arquivos são montados no container. O navegador pode levar até 5 minutos para pegar `.css` e `.js` novos (cache curto); as páginas `.html` não ficam em cache.
+- Como o painel é estático (sem build), uma atualização de HTML, CSS ou JS só precisa de `git pull`: os arquivos são montados no container. O navegador revalida `.css`, `.js` e `.html` a cada acesso (sem cache fixo), então a atualização aparece ao recarregar a página. Se alterar o `nginx/painel.conf`, recarregue o nginx: `docker compose -f docker-compose.yml -f docker-compose.prod.yml restart painel`.
 - `scripts/gerar_dados_dev.py` é SÓ para o banco de desenvolvimento e NUNCA deve rodar em produção. Ele tem uma trava: recusa qualquer `DATABASE_URL` que não aponte para localhost.
 - O painel depende do domínio definido em `DOMINIO` (veja "Deploy da API na VPS"); trocar de domínio não exige mudar nada no painel.
 
