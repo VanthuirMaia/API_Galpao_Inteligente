@@ -69,14 +69,17 @@
         <div class="chip-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="chip-info-texto"><span class="chip-info-rotulo">Data</span><strong id="topo-data">--/--/----</strong></span></div>
         <div class="chip-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span class="chip-info-texto"><span class="chip-info-rotulo">Horário</span><strong id="topo-hora">--:--</strong></span></div>
       </div>
+      <div class="topo-acoes">
       <div class="status-badge caution" id="resumo" role="status" aria-live="polite">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="summary-icon"><circle cx="12" cy="12" r="9.5"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
         <div><strong id="resumo-titulo">Carregando…</strong><p id="resumo-texto">Buscando as leituras mais recentes.</p></div>
       </div>
-      <button class="theme-button" id="theme-toggle" aria-pressed="false" aria-label="Ativar tema escuro">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" stroke-linejoin="round"/></svg>
-        <span id="theme-label">Tema claro</span>
-      </button>
+      <button class="theme-button" id="theme-toggle" type="button" aria-pressed="true" aria-label="Ativar tema claro" title="Alternar tema claro/escuro">
+          <svg class="icone-lua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z"/></svg>
+          <svg class="icone-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>
+          <span id="theme-label" class="visually-hidden">Tema claro</span>
+        </button>
+    </div>
     </header>
     <section class="page active" id="page-home" aria-labelledby="page-title">
       <div class="home-grid">
