@@ -23,11 +23,16 @@ const AGREGACOES = {
   "5min": { rotulo: "médias de 5 min", esperadoMs: 5 * 60 * 1000 }, // só para o CSV agregado de períodos curtos
 };
 
-// cores consistentes entre os gráficos (interna = laranja, externa = azul, globo = roxo)
+// cores consistentes entre os gráficos (interna = laranja, externa = azul, globo = roxo); texto e grade seguem o tema
+const css = (nome) => getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
 const COR = {
-  itgu: "#1f2933", interna: "#e8590c", globo: "#862e9c", externa: "#1c7ed6",
-  conforto: "#2f9e44", critico: "#c92a2a",
+  itgu: css("--ink") || "#1f2933", interna: "#e8590c", globo: "#a35bc4", externa: "#3b9be8",
+  conforto: "#2f9e44", critico: "#e5483c",
 };
+Chart.defaults.color = css("--muted") || "#5f6b76";
+Chart.defaults.borderColor = css("--line") || "#d8dee4";
+// trocar o tema redesenha tudo com as cores novas
+window.addEventListener("nexar-tema", () => location.reload());
 
 const principal = document.getElementById("principal");
 const selectDispositivo = document.getElementById("dispositivo");

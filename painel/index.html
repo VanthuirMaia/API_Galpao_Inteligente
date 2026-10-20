@@ -8,6 +8,8 @@
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="apple-touch-icon" href="img/nexar-icone.png">
 <meta name="theme-color" content="#0a1114">
+<script src="js/tema.js"></script>
+<link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/nexar.css">
 </head>
 <body>
@@ -47,6 +49,7 @@
     </nav>
     <nav class="nav nav-mais" aria-label="Outras páginas">
       <p class="nav-titulo">Mais</p>
+      <a class="nav-button" href="historico.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-6"/></svg><span>Histórico detalhado</span></a>
       <a class="nav-button" href="diagnostico.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Diagnóstico</span></a>
       <a class="nav-button" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg><span>Minha conta</span></a>
       <a class="nav-button so-admin" hidden href="dispositivos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4" stroke-linecap="round"/></svg><span>Dispositivos</span></a>
@@ -62,9 +65,9 @@
         <p class="top-subtitle" id="page-subtitle">Acompanhe as condições das aves.</p>
       </div>
       <div class="topo-info">
-        <label class="chip" for="dispositivo" id="rotulo-dispositivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg><span class="chip-texto"><span class="chip-rotulo">Galpão</span><select id="dispositivo"></select></span></label>
-        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="chip-texto"><span class="chip-rotulo">Data</span><strong id="topo-data">--/--/----</strong></span></div>
-        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span class="chip-texto"><span class="chip-rotulo">Horário</span><strong id="topo-hora">--:--</strong></span></div>
+        <label class="chip-info" for="dispositivo" id="rotulo-dispositivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg><span class="chip-info-texto"><span class="chip-info-rotulo">Galpão</span><select id="dispositivo"></select></span></label>
+        <div class="chip-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="chip-info-texto"><span class="chip-info-rotulo">Data</span><strong id="topo-data">--/--/----</strong></span></div>
+        <div class="chip-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span class="chip-info-texto"><span class="chip-info-rotulo">Horário</span><strong id="topo-hora">--:--</strong></span></div>
       </div>
       <div class="status-badge caution" id="resumo" role="status" aria-live="polite">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="summary-icon"><circle cx="12" cy="12" r="9.5"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
@@ -248,26 +251,9 @@
       </section>
     </section>
 
-    <!-- Marcas parceiras servidas localmente (img/parceiros): a CSP do painel só aceita imagens do próprio site. -->
-    <footer class="brand-footer" aria-label="Logotipos das instituições parceiras">
-      <div class="brand-logo see">
-        <img src="img/parceiros/see.png" alt="Secretaria de Educação de Pernambuco (SEE-PE)" loading="lazy" decoding="async">
-      </div>
-      <div class="brand-logo secti">
-        <img src="img/parceiros/secti.png" alt="Secretaria de Ciência, Tecnologia e Inovação de Pernambuco (SECTI-PE)" loading="lazy" decoding="async">
-      </div>
-      <div class="brand-logo ete">
-        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iNzYiIHZpZXdCb3g9IjAgMCAyMjAgNzYiPgogICAgICAgICAgPHJlY3QgeD0iMzIiIHk9IjUiIHdpZHRoPSIxNTYiIGhlaWdodD0iNDMiIHJ4PSI3IiBmaWxsPSIjMDc1NmEyIi8+CiAgICAgICAgICA8cmVjdCB4PSIxOCIgeT0iOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjgiIHJ4PSIxIiBmaWxsPSIjZWZiZjI0Ii8+CiAgICAgICAgICA8cmVjdCB4PSIxOCIgeT0iMjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSI4IiByeD0iMSIgZmlsbD0iIzIwYTM1YiIvPgogICAgICAgICAgPHJlY3QgeD0iMTgiIHk9IjM1IiB3aWR0aD0iMTAiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiNkOTM2MzYiLz4KICAgICAgICAgIDxyZWN0IHg9IjE5MiIgeT0iOSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjgiIHJ4PSIxIiBmaWxsPSIjZWZiZjI0Ii8+CiAgICAgICAgICA8cmVjdCB4PSIxOTIiIHk9IjIyIiB3aWR0aD0iMTAiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMyMGEzNWIiLz4KICAgICAgICAgIDxyZWN0IHg9IjE5MiIgeT0iMzUiIHdpZHRoPSIxMCIgaGVpZ2h0PSI4IiByeD0iMSIgZmlsbD0iI2Q5MzYzNiIvPgogICAgICAgICAgPHRleHQgeD0iMTEwIiB5PSIzOCIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM0IiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FVEU8L3RleHQ+CiAgICAgICAgICA8dGV4dCB4PSIxMTAiIHk9IjU5IiBmaWxsPSIjMjQ0MDVhIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSI4MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkVTQ09MQSBUw4lDTklDQSBFU1RBRFVBTDwvdGV4dD4KICAgICAgICAgIDx0ZXh0IHg9IjExMCIgeT0iNzAiIGZpbGw9IiMyNDQwNWEiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI4LjUiIGZvbnQtd2VpZ2h0PSI3MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkdPVkVSTkFET1IgRURVQVJETyBDQU1QT1M8L3RleHQ+CiAgICAgICAgPC9zdmc+" alt="Logotipo ETE — Escola Técnica Estadual Governador Eduardo Campos" loading="eager" decoding="async">
-      </div>
-      <div class="brand-logo facepe">
-        <img src="img/parceiros/facepe.png" alt="Fundação de Amparo à Ciência e Tecnologia de Pernambuco (FACEPE)" loading="lazy" decoding="async">
-      </div>
-      <div class="brand-logo agil">
-        <img src="img/parceiros/agil.png" alt="Agil Pernambuco" loading="lazy" decoding="async">
-      </div>
-    </footer>
   </main>
 </div>
+<footer id="rodape" class="rodape"></footer>
 <script type="module" src="js/nexar.js"></script>
 </body>
 </html>

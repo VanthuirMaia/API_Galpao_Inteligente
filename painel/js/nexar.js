@@ -2,6 +2,7 @@
 // As outras telas (diagnóstico, conta, administração) continuam em páginas próprias.
 import { api, login } from "./api.js";
 import { ambienteRotulo, dataCurta, diasRotulo, el, haQuanto, hojeRecifeISO, hora, horaMinuto, numero } from "./formato.js";
+import { montarRodape } from "./layout.js";
 import { lerSessao, limparSessao, salvarSessao, sair } from "./sessao.js";
 
 const INTERVALO_MS = 60000;
@@ -36,7 +37,7 @@ function gravarPref(chave, valor) {
 let escala = 1;
 
 function aplicarTema(escuro) {
-  document.body.classList.toggle("dark", escuro);
+  document.documentElement.classList.toggle("dark", escuro);
   const botao = $("theme-toggle");
   botao.setAttribute("aria-pressed", String(escuro));
   botao.setAttribute("aria-label", escuro ? "Ativar tema claro" : "Ativar tema escuro");
@@ -66,7 +67,7 @@ function iniciarPreferencias() {
   const salva = Number(lerPref(PREF_ESCALA));
   if (ESCALAS.includes(salva)) aplicarEscala(salva);
 
-  $("theme-toggle").addEventListener("click", () => definirTema(!document.body.classList.contains("dark")));
+  $("theme-toggle").addEventListener("click", () => definirTema(!document.documentElement.classList.contains("dark")));
   $("theme-light").addEventListener("click", () => definirTema(false));
   $("theme-dark").addEventListener("click", () => definirTema(true));
   $("font-up").addEventListener("click", () => mudarEscala(1));
@@ -588,6 +589,7 @@ async function atualizar() {
 function mostrarApp(sessao) {
   $("login").hidden = true;
   $("app").hidden = false;
+  document.body.classList.add("com-menu");
   document.querySelectorAll(".so-admin").forEach((a) => { a.hidden = sessao.perfil !== "admin"; });
   $("usuario-logado").textContent = `${sessao.nome} (${sessao.perfil})`;
   relogio();
@@ -633,6 +635,7 @@ function iniciarLogin() {
 
 function iniciar() {
   iniciarPreferencias();
+  montarRodape();
   document.querySelectorAll(".nav-button[data-page]").forEach((b) => b.addEventListener("click", () => irPara(b.dataset.page)));
   document.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => irPara(b.dataset.goto)));
   $("dispositivo").addEventListener("change", (ev) => {
