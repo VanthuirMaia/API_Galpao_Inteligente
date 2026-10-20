@@ -26,7 +26,7 @@
     <label for="senha">Senha</label>
     <input id="senha" type="password" autocomplete="current-password" required>
     <p class="login-erro" id="erro-login" role="alert"></p>
-    <button class="action-button" type="submit">ENTRAR</button>
+    <button class="action-button" type="submit">Entrar</button>
   </form>
 </section>
 <div class="app" id="app" hidden>
@@ -38,13 +38,13 @@
         <div class="brand-slogan">Tecnologia que cuida do seu amanhã</div>
       </div>
     </div>
-    <nav class="nav" aria-label="Páginas">
+    <nav class="nav nav-principal" aria-label="Páginas">
       <button class="nav-button" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3z" stroke-linejoin="round"/></svg><span>Início</span></button>
       <button class="nav-button" data-page="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg><span>Ver galpão</span></button>
       <button class="nav-button" data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7M17 6h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Histórico</span></button>
       <button class="nav-button" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.2 1-1.6 2.8-1.5-.5a8 8 0 0 1-1.6.9l-.3 1.6h-3.2l-.3-1.6a8 8 0 0 1-1.6-.9l-1.5.5-1.6-2.8 1.2-1a8 8 0 0 1 0-1.9l-1.2-1 1.6-2.8 1.5.5a8 8 0 0 1 1.6-.9l.3-1.6h3.2l.3 1.6a8 8 0 0 1 1.6.9l1.5-.5 1.6 2.8-1.2 1a8 8 0 0 1 0 1.9Z" transform="translate(-1 -1) scale(1.08)"/></svg><span>Configurar</span></button>
     </nav>
-    <nav class="nav" aria-label="Outras páginas">
+    <nav class="nav nav-mais" aria-label="Outras páginas">
       <p class="nav-titulo">Mais</p>
       <a class="nav-button" href="diagnostico.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Diagnóstico</span></a>
       <a class="nav-button" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg><span>Minha conta</span></a>
@@ -64,14 +64,14 @@
         <label class="seletor" for="dispositivo" id="rotulo-dispositivo" hidden>Galpão<select id="dispositivo"></select></label>
         <button class="theme-button" id="theme-toggle" aria-pressed="false" aria-label="Ativar tema escuro">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" stroke-linejoin="round"/></svg>
-          <span id="theme-label">TEMA ESCURO</span>
+          <span id="theme-label">Tema escuro</span>
         </button>
       </div>
     </header>
     <section class="page active" id="page-home" aria-labelledby="page-title">
       <div class="summary caution" id="resumo" role="status" aria-live="polite">
         <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>
-        <div><strong id="resumo-titulo">CARREGANDO…</strong><p id="resumo-texto">Buscando as leituras mais recentes.</p></div>
+        <div><strong id="resumo-titulo">Carregando…</strong><p id="resumo-texto">Buscando as leituras mais recentes.</p></div>
       </div>
 
       <div class="metrics" aria-label="Leituras atuais">
@@ -82,7 +82,7 @@
           </div>
           <p class="value" data-campo="valor">--</p>
           <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
           <p class="metric-note" data-campo="nota">&nbsp;</p>
         </article>
 
@@ -93,7 +93,7 @@
           </div>
           <p class="value" data-campo="valor">--</p>
           <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
           <p class="metric-note" data-campo="nota">&nbsp;</p>
         </article>
 
@@ -104,7 +104,7 @@
           </div>
           <p class="value" data-campo="valor">--</p>
           <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
           <p class="metric-note" data-campo="nota">&nbsp;</p>
         </article>
 
@@ -115,7 +115,7 @@
           </div>
           <p class="value" data-campo="valor">--</p>
           <span class="pill" data-campo="pill">Aguardando</span>
-          <p class="action-text" data-campo="acao">AGUARDANDO LEITURA.</p>
+          <p class="action-text" data-campo="acao">Aguardando leitura.</p>
           <p class="metric-note" data-campo="nota">&nbsp;</p>
         </article>
       </div>
@@ -123,9 +123,9 @@
       <section class="actions-panel" aria-labelledby="quick-title">
         <h2 class="section-heading" id="quick-title">O que deseja fazer?</h2>
         <div class="quick-actions">
-          <button class="action-button" data-goto="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m2 11 10-8 10 8M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg>VER GALPÃO</button>
-          <button class="action-button secondary" data-goto="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>VER HISTÓRICO</button>
-          <button class="action-button secondary" data-goto="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>VER ALERTAS</button>
+          <button class="action-button" data-goto="barn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m2 11 10-8 10 8M5 9v12h14V9M9 21v-7h6v7" stroke-linejoin="round"/></svg>Ver galpão</button>
+          <button class="action-button secondary" data-goto="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 3v18h18M6 15l5-5 4 3 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>Ver histórico</button>
+          <button class="action-button secondary" data-goto="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/></svg>Ver alertas</button>
         </div>
       </section>
       <p class="footnote" id="status">Conectando…</p>
@@ -145,8 +145,8 @@
             </g>
             <g fill="#44835f"><path d="M142 98q20 7 10 24t-10 0q-10 15-12 0t12-24ZM118 122q7-20 24-10t0 10q15 10 0 12t-24-12ZM142 146q-20-7-10-24t10 0q10-15 12 0t-12 24ZM166 122q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/><path d="M538 98q20 7 10 24t-10 0q-10 15-12 0t12-24ZM514 122q7-20 24-10t0 10q15 10 0 12t-24-12ZM538 146q-20-7-10-24t10 0q10-15 12 0t-12 24ZM562 122q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/><path d="M142 270q20 7 10 24t-10 0q-10 15-12 0t12-24ZM118 294q7-20 24-10t0 10q15 10 0 12t-24-12ZM142 318q-20-7-10-24t10 0q10-15 12 0t-12 24ZM166 294q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/><path d="M538 270q20 7 10 24t-10 0q-10 15-12 0t12-24ZM514 294q7-20 24-10t0 10q15 10 0 12t-24-12ZM538 318q-20-7-10-24t10 0q10-15 12 0t-12 24ZM562 294q-7 20-24 10t0-10q-15-10 0-12t24 12Z"/></g>
             <g fill="#b3dfc1"><circle cx="208" cy="109" r="5"/><circle cx="234" cy="109" r="5"/><circle cx="260" cy="109" r="5"/><circle cx="286" cy="109" r="5"/><circle cx="312" cy="109" r="5"/><circle cx="338" cy="109" r="5"/><circle cx="364" cy="109" r="5"/><circle cx="390" cy="109" r="5"/><circle cx="416" cy="109" r="5"/><circle cx="442" cy="109" r="5"/><circle cx="468" cy="109" r="5"/></g>
-            <g class="caixa caution" id="caixa-temp"><rect x="218" y="155" width="244" height="70" rx="15"/><text x="340" y="183" font-size="19" text-anchor="middle">TEMPERATURA</text><text id="svg-temp" x="340" y="211" font-size="30" text-anchor="middle">-- °C</text></g>
-            <g class="caixa caution" id="caixa-umid"><rect x="236" y="244" width="208" height="60" rx="15"/><text x="340" y="267" font-size="16" text-anchor="middle">UMIDADE</text><text id="svg-umid" x="340" y="291" font-size="26" text-anchor="middle">--%</text></g>
+            <g class="caixa caution" id="caixa-temp"><rect x="218" y="155" width="244" height="70" rx="15"/><text x="340" y="183" font-size="19" text-anchor="middle">Temperatura</text><text id="svg-temp" x="340" y="211" font-size="30" text-anchor="middle">-- °C</text></g>
+            <g class="caixa caution" id="caixa-umid"><rect x="236" y="244" width="208" height="60" rx="15"/><text x="340" y="267" font-size="16" text-anchor="middle">Umidade</text><text id="svg-umid" x="340" y="291" font-size="26" text-anchor="middle">--%</text></g>
           </svg>
         </section>
         <aside class="panel">
@@ -156,7 +156,7 @@
             <div class="legend-item"><span class="legend-dot amarelo"></span><div><strong>Amarelo</strong><p>Atenção: acompanhe de perto.</p></div></div>
             <div class="legend-item"><span class="legend-dot verde"></span><div><strong>Verde</strong><p>Tudo bem: pode manter como está.</p></div></div>
           </div>
-          <button class="action-button largo" data-goto="alerts">VER TODOS OS ALERTAS</button>
+          <button class="action-button largo" data-goto="alerts">Ver todos os alertas</button>
         </aside>
       </div>
     </section>
@@ -185,12 +185,12 @@
       <section class="panel">
         <h2>Leitura da tela</h2>
         <div class="setting-row"><div><strong>Tamanho das letras</strong><br><span>Deixe os números e textos maiores.</span></div><div class="setting-controls"><button class="small-button" id="font-down" aria-label="Diminuir o tamanho das letras">A−</button><button class="small-button" id="font-up" aria-label="Aumentar o tamanho das letras">A+</button><button class="small-button" id="font-reset">Normal</button></div></div>
-        <div class="setting-row"><div><strong>Tema da tela</strong><br><span>Use cores escuras em ambientes com pouca luz.</span></div><div class="setting-controls"><button class="small-button" id="theme-light">CLARO</button><button class="small-button" id="theme-dark">ESCURO</button></div></div>
+        <div class="setting-row"><div><strong>Tema da tela</strong><br><span>Use cores escuras em ambientes com pouca luz.</span></div><div class="setting-controls"><button class="small-button" id="theme-light">Claro</button><button class="small-button" id="theme-dark">Escuro</button></div></div>
       </section>
       <section class="panel">
         <h2>Sua conta</h2>
         <p class="nota-usuario" id="usuario-logado"></p>
-        <button class="small-button" id="sair">SAIR DA CONTA</button>
+        <button class="small-button" id="sair">Sair da conta</button>
       </section>
     </section>
 

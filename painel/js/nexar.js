@@ -40,7 +40,7 @@ function aplicarTema(escuro) {
   const botao = $("theme-toggle");
   botao.setAttribute("aria-pressed", String(escuro));
   botao.setAttribute("aria-label", escuro ? "Ativar tema claro" : "Ativar tema escuro");
-  $("theme-label").textContent = escuro ? "TEMA CLARO" : "TEMA ESCURO";
+  $("theme-label").textContent = escuro ? "Tema claro" : "Tema escuro";
   document.querySelector('meta[name="color-scheme"]').content = escuro ? "dark" : "light";
 }
 
@@ -159,13 +159,13 @@ function direcao(leitura, situacao) {
 }
 
 function textoTemperatura(classe, dir) {
-  if (classe === "conforto") return { pill: "Boa", acao: "PODE MANTER COMO ESTÁ.", nota: "A temperatura está na faixa indicada." };
-  if (classe === "sem_faixa") return { pill: "Sem faixa", acao: "DEFINA A FAIXA DO LOTE.", nota: "Sem faixa de ITGU, não dá para avaliar." };
+  if (classe === "conforto") return { pill: "Boa", acao: "Pode manter como está.", nota: "A temperatura está na faixa indicada." };
+  if (classe === "sem_faixa") return { pill: "Sem faixa", acao: "Defina a faixa do lote.", nota: "Sem faixa de ITGU, não dá para avaliar." };
   const forte = classe === "critico";
   if (dir === "frio") {
-    return { pill: forte ? "Muito frio" : "Frio", acao: "CONFIRA O AQUECIMENTO.", nota: "Frio demais pode prejudicar as aves." };
+    return { pill: forte ? "Muito frio" : "Frio", acao: "Confira o aquecimento.", nota: "Frio demais pode prejudicar as aves." };
   }
-  return { pill: forte ? "Muito quente" : "Quente", acao: forte ? "LIGUE A VENTILAÇÃO." : "FIQUE DE OLHO NA VENTILAÇÃO.", nota: "Confira se o ar está circulando." };
+  return { pill: forte ? "Muito quente" : "Quente", acao: forte ? "Ligue a ventilação." : "Fique de olho na ventilação.", nota: "Confira se o ar está circulando." };
 }
 
 function cartaoTemperatura(leitura, situacao) {
@@ -178,14 +178,14 @@ function cartaoUmidade(leitura) {
   const ur = leitura.ur_int;
   let estado = "safe";
   let pill = "Boa";
-  let acao = "PODE MANTER COMO ESTÁ.";
+  let acao = "Pode manter como está.";
   let nota = "A umidade está na faixa indicada.";
   if (ur < UR_BOA[0] || ur > UR_BOA[1]) {
     const baixa = ur < UR_BOA[0];
     const critica = ur < UR_LIMITE[0] || ur > UR_LIMITE[1];
     estado = critica ? "danger" : "caution";
     pill = baixa ? (critica ? "Muito baixa" : "Baixa") : critica ? "Muito alta" : "Alta";
-    acao = baixa ? "O AR ESTÁ SECO DEMAIS." : "O AR ESTÁ ÚMIDO DEMAIS.";
+    acao = baixa ? "O ar está seco demais." : "O ar está úmido demais.";
     nota = baixa ? "Ar seco levanta poeira e incomoda as aves." : "Ar úmido deixa a cama molhada.";
   }
   preencherCartao("m-umid", { estado, valor: `${numero(ur, 0)}%`, pill, acao, nota });
@@ -195,7 +195,7 @@ function cartaoExterna(leitura) {
   if (leitura.t_ext === null || leitura.t_ext === undefined) {
     preencherCartao("m-ext", {
       estado: "caution", valor: "-- °C", rotuloValor: "Sem leitura", pill: "Sem sinal",
-      acao: "CONFIRA O SENSOR EXTERNO.", nota: "Não chegou uma leitura de fora.",
+      acao: "Confira o sensor externo.", nota: "Não chegou uma leitura de fora.",
     });
     return;
   }
@@ -203,27 +203,27 @@ function cartaoExterna(leitura) {
   const nota = Math.abs(dif) < 0.5
     ? "Dentro e fora estão com a mesma temperatura."
     : `Dentro está ${numero(Math.abs(dif), 1)} °C ${dif > 0 ? "mais quente" : "mais frio"} que fora.`;
-  preencherCartao("m-ext", { estado: "safe", valor: `${numero(leitura.t_ext, 1)} °C`, pill: "Lendo", acao: "SENSOR EXTERNO FUNCIONANDO.", nota });
+  preencherCartao("m-ext", { estado: "safe", valor: `${numero(leitura.t_ext, 1)} °C`, pill: "Lendo", acao: "Sensor externo funcionando.", nota });
 }
 
 function cartaoCalor(leitura, situacao) {
   const classe = situacao.classificacao || "sem_faixa";
   const dir = direcao(leitura, situacao);
   const info = CLASSIFICACAO[classe] || CLASSIFICACAO.sem_faixa;
-  let valor = "NORMAL";
-  let acao = "PODE MANTER COMO ESTÁ.";
+  let valor = "Normal";
+  let acao = "Pode manter como está.";
   let nota = "O calor está dentro do esperado para as aves.";
   if (classe === "sem_faixa") {
     valor = "--";
-    acao = "DEFINA A FAIXA DO LOTE.";
+    acao = "Defina a faixa do lote.";
     nota = "Informe a data de alojamento do lote.";
   } else if (dir === "quente") {
     valor = "ALTO";
-    acao = "MELHORE A VENTILAÇÃO.";
+    acao = "Melhore a ventilação.";
     nota = "Calor forte pode prejudicar as aves.";
   } else if (dir === "frio") {
-    valor = "BAIXO";
-    acao = "CONFIRA O AQUECIMENTO.";
+    valor = "Baixo";
+    acao = "Confira o aquecimento.";
     nota = "Frio forte pode prejudicar as aves.";
   }
   nota += ` ITGU ${numero(leitura.itgu, 1)}.`;
@@ -236,7 +236,7 @@ function cartaoCalor(leitura, situacao) {
 
 function cartoesSemDado(offline) {
   const pill = offline ? "Sem sinal" : "Aguardando";
-  const acao = offline ? "CONFIRA O EQUIPAMENTO." : "AGUARDANDO LEITURA.";
+  const acao = offline ? "Confira o equipamento." : "Aguardando leitura.";
   const nota = offline ? "O galpão não envia leituras há um tempo." : "Ainda não chegou nenhuma leitura.";
   for (const id of ["m-temp", "m-umid", "m-ext", "m-calor"]) {
     preencherCartao(id, { estado: "sem-dado", valor: "--", rotuloValor: "Sem leitura", pill, acao, nota });
@@ -250,6 +250,10 @@ function resumo(estado, titulo, texto) {
   if (estado === "caution") r.classList.add("caution");
   $("resumo-titulo").textContent = titulo;
   $("resumo-texto").textContent = texto;
+  // ícone acompanha a situação (constantes do código, nunca dado da API)
+  r.querySelector(".summary-icon").innerHTML = estado === "good"
+    ? '<circle cx="12" cy="12" r="9.5"/><path d="m7.5 12.5 3 3 6-6.5" stroke-linecap="round" stroke-linejoin="round"/>'
+    : '<path d="M12 3 22 21H2L12 3Z" stroke-linejoin="round"/><path d="M12 9v5m0 3h.01" stroke-linecap="round"/>';
 }
 
 function pintarCaixaSvg(id, estado, texto) {
@@ -263,14 +267,14 @@ function mostrarInicio() {
   const d = dispositivoAtual();
   if (!d) {
     cartoesSemDado(false);
-    resumo("caution", "NENHUM GALPÃO CADASTRADO", "Peça a um administrador para cadastrar um dispositivo.");
+    resumo("caution", "Nenhum galpão cadastrado", "Peça a um administrador para cadastrar um dispositivo.");
     return;
   }
   const u = ultimas[d.id];
   const leitura = u && u.leitura;
   if (!leitura) {
     cartoesSemDado(false);
-    resumo("caution", "AGUARDANDO LEITURAS", "O galpão ainda não enviou nenhuma leitura.");
+    resumo("caution", "Aguardando leituras", "O galpão ainda não enviou nenhuma leitura.");
     pintarCaixaSvg("caixa-temp", "caution", "-- °C");
     pintarCaixaSvg("caixa-umid", "caution", "--%");
     return;
@@ -285,15 +289,15 @@ function mostrarInicio() {
   const dir = direcao(leitura, situacao);
   const idade = `Última leitura ${haQuanto(leitura.ts)}.`;
   if (!d.online) {
-    resumo("caution", "SEM SINAL DO GALPÃO", `${idade} Confira o equipamento e a internet.`);
+    resumo("caution", "Sem sinal do galpão", `${idade} Confira o equipamento e a internet.`);
   } else if (classe === "critico") {
-    resumo("danger", "ALERTA: VERIFICAR O GALPÃO", dir === "frio" ? "Está muito frio. Confira o aquecimento agora." : "Está muito quente. Confira a ventilação agora.");
+    resumo("danger", "Alerta: verificar o galpão", dir === "frio" ? "Está muito frio. Confira o aquecimento agora." : "Está muito quente. Confira a ventilação agora.");
   } else if (classe === "alerta") {
-    resumo("caution", "ATENÇÃO COM O GALPÃO", dir === "frio" ? "A temperatura está baixando. Acompanhe de perto." : "A temperatura está subindo. Acompanhe de perto.");
+    resumo("caution", "Atenção com o galpão", dir === "frio" ? "A temperatura está baixando. Acompanhe de perto." : "A temperatura está subindo. Acompanhe de perto.");
   } else if (classe === "sem_faixa") {
-    resumo("caution", "FALTA DEFINIR A FAIXA", "Informe a data de alojamento do lote para avaliar o conforto.");
+    resumo("caution", "Falta definir a faixa", "Informe a data de alojamento do lote para avaliar o conforto.");
   } else {
-    resumo("good", "TUDO BEM NO GALPÃO", "As aves estão em conforto. Pode manter como está.");
+    resumo("good", "Tudo bem no galpão", "As aves estão em conforto. Pode manter como está.");
   }
 
   pintarCaixaSvg("caixa-temp", ESTADO_DA_CLASSE[classe], `${numero(leitura.t_int, 1)} °C`);
@@ -496,7 +500,7 @@ async function atualizar() {
       $("status").textContent = "Não foi possível atualizar agora. Mostrando os últimos dados recebidos.";
     } else {
       $("status").textContent = e instanceof TypeError ? "Sem conexão com o servidor." : e.message;
-      resumo("caution", "SEM CONEXÃO", "Não foi possível buscar as leituras agora.");
+      resumo("caution", "Sem conexão", "Não foi possível buscar as leituras agora.");
     }
   } finally {
     emAndamento = false;
@@ -532,7 +536,7 @@ function iniciarLogin() {
       return;
     }
     botao.disabled = true;
-    botao.textContent = "ENTRANDO…";
+    botao.textContent = "Entrando…";
     try {
       const r = await login(email, senha);
       const sessao = { token: r.access_token, nome: r.nome, perfil: r.perfil };
@@ -543,7 +547,7 @@ function iniciarLogin() {
       erro.textContent = e instanceof TypeError ? "Sem conexão com o servidor." : e.message;
     } finally {
       botao.disabled = false;
-      botao.textContent = "ENTRAR";
+      botao.textContent = "Entrar";
     }
   });
 }
