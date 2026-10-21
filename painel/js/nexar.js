@@ -193,12 +193,12 @@ function textoTemperatura(classe, dir) {
   if (classe === "sem_faixa") return { pill: "Sem faixa", acao: "Defina a faixa do lote.", nota: "Sem faixa de ITGU, não dá para avaliar." };
   const forte = classe === "critico";
   if (dir === "frio") {
-    return { pill: forte ? "Muito frio" : "Frio", acao: "Confira o aquecimento.", nota: "Frio demais pode prejudicar as aves." };
+    return { pill: forte ? "Muito frio" : "Frio", acao: forte ? "Eleve a temperatura do galpão." : "Acompanhe a temperatura de perto.", nota: "Frio demais pode prejudicar as aves." };
   }
   return {
     pill: forte ? "Muito quente" : "Quente",
-    acao: forte ? "Ligue a ventilação." : "Fique de olho na ventilação.",
-    nota: "Calor forte pode prejudicar as aves. Confira se o ar está circulando.",
+    acao: forte ? "Reduza a temperatura do galpão." : "Acompanhe a temperatura de perto.",
+    nota: "Calor forte pode prejudicar as aves.",
   };
 }
 
@@ -315,8 +315,8 @@ function mostrarInicio() {
   if (!d.online) {
     situacaoGeral("caution", "Sem sinal do galpão", `Última leitura ${haQuanto(leitura.ts)}.`, "Sem sinal", `O galpão parou de enviar leituras (${haQuanto(leitura.ts)}). Confira o equipamento e a internet.`);
   } else if (classe === "critico") {
-    const msg = dir === "frio" ? "Está muito frio. Confira o aquecimento agora." : "Está muito quente. Confira a ventilação agora.";
-    situacaoGeral("danger", "Ambiente crítico", dir === "frio" ? "Confira o aquecimento" : "Confira a ventilação", "Crítico", msg);
+    const msg = dir === "frio" ? "Está muito frio. Corrija a temperatura do galpão agora." : "Está muito quente. Corrija a temperatura do galpão agora.";
+    situacaoGeral("danger", "Ambiente crítico", "Temperatura fora da faixa", "Crítico", msg);
   } else if (classe === "alerta") {
     const msg = dir === "frio" ? "A temperatura está baixando. Acompanhe de perto." : "A temperatura está subindo. Acompanhe de perto.";
     situacaoGeral("caution", "Atenção", "Acompanhe de perto", "Atenção", msg);
@@ -392,7 +392,7 @@ function montarAlertas() {
     const temp = `${numero(leitura.t_int, 1)} °C`;
     if (classe === "critico") {
       novo(0, "danger", `${nome}: ${dir === "frio" ? "muito frio" : "muito quente"}`,
-        dir === "frio" ? "Confira o aquecimento agora." : "Ligue a ventilação e confira se o ar está circulando.", `${meta} · ITGU ${numero(leitura.itgu, 1)}`,
+        dir === "frio" ? "Temperatura muito baixa: corrija agora." : "Temperatura muito alta: corrija agora.", `${meta} · ITGU ${numero(leitura.itgu, 1)}`,
         { ts: leitura.ts, param: "Temperatura", valor: temp, estado: "danger", statusTexto: "Crítico" });
     } else if (classe === "alerta") {
       novo(1, "warning", `${nome}: atenção com ${dir === "frio" ? "o frio" : "o calor"}`, "Acompanhe de perto nas próximas horas.", `${meta} · ITGU ${numero(leitura.itgu, 1)}`,
