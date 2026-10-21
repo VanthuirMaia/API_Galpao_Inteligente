@@ -279,3 +279,9 @@ body.legado > main { grid-column: 2; grid-row: 1; align-self: stretch; }
   .side-conta { display: none; }
 }
 .side-botoes .small-button { flex: 1 1 0; text-align: center; white-space: nowrap; }
+
+/* ---------- Sair no menu lateral ---------- */
+.side-conta-sessao { margin-bottom: .9rem; padding-bottom: .9rem; border-bottom: 1px solid rgba(255,255,255,.1); text-align: left; font-family: inherit; font-style: normal; }
+.side-frase { margin: 0; }
+.nav-sair { display: none; }
+@media (max-width: 850px) { .nav-sair { display: flex; } }

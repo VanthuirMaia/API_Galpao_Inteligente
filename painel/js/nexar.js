@@ -592,6 +592,8 @@ function mostrarApp(sessao) {
   document.body.classList.add("com-menu");
   document.querySelectorAll(".so-admin").forEach((a) => { a.hidden = sessao.perfil !== "admin"; });
   $("usuario-logado").textContent = `${sessao.nome} (${sessao.perfil})`;
+  $("side-nome").textContent = sessao.nome;
+  $("side-perfil").textContent = sessao.perfil;
   relogio();
   setInterval(relogio, 15000);
   const hash = location.hash.slice(1);
@@ -645,7 +647,7 @@ function iniciar() {
     atualizarTitulo();
     carregarHistorico(true);
   });
-  $("sair").addEventListener("click", sair);
+  document.querySelectorAll("#sair, [data-sair]").forEach((b) => b.addEventListener("click", sair));
   window.addEventListener("hashchange", () => {
     const h = location.hash.slice(1);
     if (PAGINAS[h] && h !== paginaAtual) irPara(h, { foco: false });

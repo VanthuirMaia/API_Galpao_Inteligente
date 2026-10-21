@@ -53,8 +53,15 @@
       <a class="nav-button so-admin" hidden href="dispositivos.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4" stroke-linecap="round"/></svg><span>Dispositivos</span></a>
       <a class="nav-button so-admin" hidden href="faixas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg><span>Faixas de ITGU</span></a>
       <a class="nav-button so-admin" hidden href="usuarios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M17 11a3 3 0 1 0 0-6" stroke-linecap="round"/></svg><span>Usuários</span></a>
+      <button class="nav-button nav-sair" type="button" data-sair><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M16 8l4 4-4 4M20 12H9"/></svg><span>Sair</span></button>
     </nav>
-    <div class="side-bottom">Bem-estar das aves,<br>mais produtividade.</div>
+    <div class="side-bottom">
+      <div class="side-conta-sessao">
+        <div class="side-usuario"><span class="side-nome" id="side-nome"></span><span class="side-perfil" id="side-perfil"></span></div>
+        <div class="side-botoes"><button class="small-button" type="button" data-sair>Sair</button></div>
+      </div>
+      <p class="side-frase">Bem-estar das aves,<br>mais produtividade.</p>
+    </div>
   </aside>
   <main id="main" tabindex="-1">
     <header class="topbar">

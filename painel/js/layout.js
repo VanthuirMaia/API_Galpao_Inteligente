@@ -24,6 +24,7 @@ const ICONES = {
   pulso: '<path d="M3 12h4l3-8 4 16 3-8h4" stroke-linecap="round" stroke-linejoin="round"/>',
   usuario: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/>',
   dispositivo: '<rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4" stroke-linecap="round"/>',
+  sair: '<path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M16 8l4 4-4 4M20 12H9" stroke-linecap="round" stroke-linejoin="round"/>',
   faixas: '<path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/>',
   usuarios: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M17 11a3 3 0 1 0 0-6" stroke-linecap="round"/>',
 };
@@ -137,6 +138,13 @@ export function montarLayout() {
   mais.setAttribute("aria-label", "Outras páginas");
   const extras = sessao.perfil === "admin" ? [...MAIS, ...MAIS_ADMIN] : MAIS;
   mais.append(el("p", "nav-titulo", "Mais"), ...extras.map(itemMenu));
+  // no celular o bloco do usuário some: o Sair vira um atalho na fila
+  const sairAtalho = el("button", "nav-button nav-sair");
+  sairAtalho.type = "button";
+  sairAtalho.innerHTML = icone("sair");
+  sairAtalho.append(el("span", null, "Sair"));
+  sairAtalho.addEventListener("click", sair);
+  mais.append(sairAtalho);
 
   const tema = el("button", "small-button", escuroAtivo() ? "Tema claro" : "Tema escuro");
   tema.type = "button";
