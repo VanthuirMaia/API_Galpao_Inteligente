@@ -11,3 +11,6 @@ mosquitto/config/passwd
 
 # capturas de tela do teste do painel
 capturas/
+
+# firmware do ESP32: credenciais reais (use firmware/secrets_exemplo.h como modelo)
+firmware/secrets.h

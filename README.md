@@ -119,6 +119,10 @@ Notas:
 - `scripts/gerar_dados_dev.py` é SÓ para o banco de desenvolvimento e NUNCA deve rodar em produção. Ele tem uma trava: recusa qualquer `DATABASE_URL` que não aponte para localhost.
 - O painel depende do domínio definido em `DOMINIO` (veja "Deploy da API na VPS"); trocar de domínio não exige mudar nada no painel.
 
+## Firmware do ESP32
+
+O firmware dos galpões (ESP32 com 3 sensores SHT40 e 2 relés, desenvolvido pelos alunos do projeto) está em `firmware/`. Lá estão a pinagem, as bibliotecas, o formato da mensagem MQTT e como compilar e gravar: veja `firmware/README.md`. As credenciais (Wi-Fi, MQTT e IP do broker) ficam em `firmware/secrets.h`, que **não** vai para o Git; use `firmware/secrets_exemplo.h` como modelo.
+
 ## Faixas de ITGU
 
 O ITGU é classificado pela faixa da idade do lote (dias desde o alojamento): **conforto** dentro dos limites de conforto, **crítico** além dos limites críticos, **alerta** no meio. Um limite que não existe na literatura fica **vazio** (nulo): o painel não escreve nada sobre ele e a escala dos gráficos usa só os limites que existem (migração `db/005`; só o conforto máximo é obrigatório).
