@@ -25,8 +25,17 @@ services:
     restart: unless-stopped
 
   api:
-    build: ./api
+    build:
+      context: ./api
+      # a API usa o mesmo ml/features.py do treino (ver api/Dockerfile)
+      additional_contexts:
+        ml: ./ml
     env_file: .env
+    environment:
+      MODELO_DIR: /srv/modelo
+    volumes:
+      # modelo de previsão do ITGU: trocar os arquivos aqui basta, a API recarrega sozinha
+      - ./ml/modelo:/srv/modelo:ro
     # vivo = o app responde (o /saude devolve 200 mesmo com o banco fora; o campo "banco" mostra o estado)
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/saude', timeout=3)"]

@@ -1,7 +1,7 @@
 [project]
 name = "galpao-ml"
 version = "0.1.0"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "matplotlib>=3.11.2",
     "numpy>=2.5.5",
@@ -9,3 +9,12 @@ dependencies = [
     "scikit-learn>=1.9.1",
     "xgboost>=3.4.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

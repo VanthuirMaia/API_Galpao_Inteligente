@@ -1,7 +1,7 @@
 // Painel Nexar (index.html): início, galpão, histórico, alertas e configurações numa página só.
 // As outras telas (diagnóstico, conta, administração) continuam em páginas próprias.
 import { api, login } from "./api.js";
-import { ambienteRotulo, dataCurta, diasRotulo, el, haQuanto, hojeRecifeISO, hora, horaMinuto, numero } from "./formato.js";
+import { ambienteRotulo, dataCurta, dataHora, diasRotulo, el, haQuanto, hojeRecifeISO, hora, horaMinuto, numero } from "./formato.js";
 import { montarRodape } from "./layout.js";
 import { lerSessao, limparSessao, salvarSessao, sair } from "./sessao.js";
 
@@ -568,6 +568,7 @@ async function atualizar() {
     ultimas = Object.fromEntries(ativos.map((d, i) => [d.id, respostas[i]]));
     montarSeletor();
     mostrarInicio();
+    atualizarPrevisao();
     montarAlertas();
     atualizarTitulo();
     temDados = true;
@@ -583,6 +584,72 @@ async function atualizar() {
   } finally {
     emAndamento = false;
   }
+}
+
+// ---------- previsão do ITGU (GET /previsao) ----------
+const TEXTO_PREVISAO = {
+  conforto: { pill: "Conforto", acao: "Deve continuar na faixa de conforto." },
+  alerta: { pill: "Alerta", acao: "Deve sair da faixa de conforto. Fique atento." },
+  critico: { pill: "Crítico", acao: "Deve chegar a nível crítico. Aja agora." },
+  sem_faixa: { pill: "Sem faixa", acao: "Defina a faixa do lote para classificar a previsão." },
+};
+const ROTULO_MODELO = { linear: "regressão linear", xgboost: "XGBoost" };
+
+/** Preenche o card "ITGU previsto". `p` é a resposta de /previsao ou {status: "erro"}. */
+function mostrarPrevisao(p, d) {
+  const c = $("m-prev");
+  const campo = (nome) => c.querySelector(`[data-campo="${nome}"]`);
+  c.classList.remove(...ESTADOS, "destacado");
+
+  if (p.status !== "ok") {
+    c.classList.add("sem-dado");
+    campo("selo").hidden = true;
+    campo("valor").textContent = "--";
+    campo("valor").setAttribute("aria-label", "Sem previsão");
+    campo("pill").textContent = "Sem previsão";
+    campo("atual").textContent = "--";
+    campo("faixa").textContent = "--";
+    campo("hora").textContent = "--";
+    const motivos = {
+      dados_insuficientes: "Ainda não há leituras contínuas suficientes (são necessários 65 min sem falhas).",
+      modelo_indisponivel: "Nenhum modelo de previsão está instalado.",
+      carregando: "Buscando a previsão…",
+    };
+    campo("acao").textContent = motivos[p.status] || "Não foi possível buscar a previsão agora.";
+    campo("nota").textContent = p.motivo || "";
+    return;
+  }
+
+  const classe = p.classificacao || "sem_faixa";
+  const texto = TEXTO_PREVISAO[classe] || TEXTO_PREVISAO.sem_faixa;
+  c.classList.add(classe === "sem_faixa" ? "sem-dado" : ESTADO_DA_CLASSE[classe]);
+  if (classe === "alerta" || classe === "critico") c.classList.add("destacado");
+
+  const faixa = d && ultimas[d.id] && ultimas[d.id].situacao && ultimas[d.id].situacao.faixa;
+  campo("horizonte").textContent = String(p.horizonte_min);
+  campo("selo").hidden = p.origem !== "sintetico"; // modelo treinado com dados de teste
+  campo("valor").textContent = numero(p.itgu_previsto, 1);
+  campo("valor").removeAttribute("aria-label");
+  campo("pill").textContent = texto.pill;
+  campo("atual").textContent = numero(p.itgu_atual, 1);
+  campo("faixa").textContent = faixa ? `${numero(faixa.conforto_min, 1)} – ${numero(faixa.conforto_max, 1)}` : "Sem faixa";
+  campo("hora").textContent = horaMinuto(new Date(p.previsto_para).getTime());
+  campo("acao").textContent = texto.acao;
+  campo("nota").textContent =
+    `Erro médio do modelo no teste: ± ${numero(p.mae_teste, 1)} ITGU · ${ROTULO_MODELO[p.modelo] || p.modelo} · treinado em ${dataHora(p.treinado_em)}`;
+}
+
+/** Busca a previsão do galpão selecionado. Falha aqui nunca derruba o resto da tela. */
+async function atualizarPrevisao() {
+  const d = dispositivoAtual();
+  if (!d) return;
+  let resposta;
+  try {
+    resposta = await api("GET", `/previsao?device_id=${encodeURIComponent(d.id)}`);
+  } catch {
+    resposta = { status: "erro" };
+  }
+  if (d.id === selecionado) mostrarPrevisao(resposta, d); // ignora resposta de galpão já trocado
 }
 
 // ---------- entrada ----------
@@ -644,6 +711,8 @@ function iniciar() {
     selecionado = ev.target.value;
     historicoDe = null;
     mostrarInicio();
+    mostrarPrevisao({ status: "carregando" }, null); // limpa o card até chegar a previsão deste galpão
+    atualizarPrevisao();
     atualizarTitulo();
     carregarHistorico(true);
   });

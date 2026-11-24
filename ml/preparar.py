@@ -36,6 +36,11 @@ def agregar_5min(df):
     return agr.dropna(axis=1, how="all")
 
 
+def descartar_janela_em_andamento(agr, agora):
+    """Mantém só as janelas já encerradas em `agora` (no treino todas são completas)."""
+    return agr[agr.index + PASSO <= agora]
+
+
 def achar_buracos(janelas):
     """Buracos entre janelas consecutivas (diferença > 15 min).
 

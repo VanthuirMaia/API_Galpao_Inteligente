@@ -119,4 +119,28 @@ Notas:
 - `scripts/gerar_dados_dev.py` é SÓ para o banco de desenvolvimento e NUNCA deve rodar em produção. Ele tem uma trava: recusa qualquer `DATABASE_URL` que não aponte para localhost.
 - O painel depende do domínio definido em `DOMINIO` (veja "Deploy da API na VPS"); trocar de domínio não exige mudar nada no painel.
 
+## Previsão do ITGU (`/previsao`)
+
+O painel mostra o ITGU previsto para daqui a 30 min. O modelo é treinado offline (pasta `ml/`) e a API só aplica o modelo salvo em `ml/modelo/`. As features são calculadas pelo **mesmo código** do treino (`ml/features.py`, copiado para a imagem da API em `/srv/ml`; o `docker-compose.yml` passa a pasta `ml/` como `additional_contexts`).
+
+- `GET /previsao?device_id=esp01` (mesmo JWT das outras rotas) devolve `status`:
+  - `ok`: `itgu_atual`, `itgu_previsto`, `horizonte_min`, `classificacao` (pela faixa vigente do dispositivo), `modelo`, `origem` (`sintetico` ou `real`), `mae_teste`, `gerado_em`;
+  - `dados_insuficientes`: faltam 65 min de leituras contínuas, a última leitura é antiga ou falta algum sensor que o modelo usa (`motivo` explica);
+  - `modelo_indisponivel`: `ml/modelo/` está vazia.
+- Quando `origem = sintetico`, o painel mostra o selo "Modelo de teste (dados sintéticos)".
+- `ml/modelo/` é um volume somente leitura: a API percebe a troca do `metadados.json` e recarrega o modelo sozinha, sem reiniciar nem refazer a imagem.
+
+### Treinar e trocar o modelo
+
+1. Exporte o CSV **bruto** (`agregacao=bruto`) do período pelo painel (Histórico) ou por `/leituras/csv`.
+2. Treine, compare e instale o melhor modelo (menor MAE entre regressão linear e XGBoost):
+   ```
+   cd ml
+   uv run python rodar.py --csv caminho/galpao_esp01_AAAAMMDD_AAAAMMDD.csv --salvar-modelo
+   ```
+   Saem também `ml/saidas/resumo.md` e os gráficos, para o relatório. Um modelo treinado com dados sintéticos não substitui um treinado com dados reais (use `--forcar` só se for de propósito). Para instalar um tipo específico em vez do melhor, use `--tipo linear` ou `--tipo xgboost`.
+3. Publique o modelo novo: `git add ml/modelo && git commit && git push` e, na VPS, `git pull`. Nada mais: a API recarrega sozinha.
+
+Testes: `cd ml && uv run pytest` (paridade treino x API, formato do modelo) e `tests/api/test_previsao_integracao.py` (rota com Postgres, `DATABASE_URL_TEST`). A API precisa de `numpy`, `pandas` e `xgboost-cpu` (já em `api/requirements.txt`).
+
 Projeto desenvolvido no Espaço CRIA da ETEGEC com apoio da Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco (FACEPE), processo ARC-0572-1.03/26.

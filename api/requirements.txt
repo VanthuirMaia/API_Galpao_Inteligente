@@ -8,3 +8,9 @@ pwdlib[argon2]
 python-multipart
 email-validator
 tzdata
+
+# previsão do ITGU (/previsao): o mesmo código de features do treino (ml/) roda aqui.
+# Versões iguais às do ml/uv.lock, para as features saírem idênticas às do treino.
+numpy==2.5.5
+pandas==3.1.1
+xgboost-cpu==3.4.1

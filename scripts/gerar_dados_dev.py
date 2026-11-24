@@ -21,7 +21,7 @@ sys.path.insert(0, str(RAIZ / "api"))
 from itgu import itgu_de_leitura  # noqa: E402
 from app.seguranca import hash_senha  # noqa: E402
 
-DIAS = 7
+DIAS = int(os.environ.get("DIAS", "7"))
 RECIFE = ZoneInfo("America/Recife")
 SENHA_LEITOR = "leitor-dev-12345"
 

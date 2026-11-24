@@ -30,7 +30,7 @@ def calcular_metricas(real, previsto):
 
 
 def treinar(X, y):
-    """Treina e avalia os três modelos. Devolve (resultado, modelo_xgb)."""
+    """Treina e avalia os três modelos. Devolve o resultado (métricas, previsões, modelos treinados)."""
     X_tr, X_te, y_tr, y_te = dividir_temporal(X, y)
 
     linear = make_pipeline(StandardScaler(), LinearRegression()).fit(X_tr, y_tr)
@@ -49,6 +49,7 @@ def treinar(X, y):
     resultado = {
         "metricas": metricas,
         "previsoes": previsoes,
+        "modelos": {"linear": linear, "xgboost": xgb},
         "n_treino": len(X_tr), "n_teste": len(X_te),
         "treino_inicio": X_tr.index[0], "treino_fim": X_tr.index[-1],
         "teste_inicio": X_te.index[0], "teste_fim": X_te.index[-1],

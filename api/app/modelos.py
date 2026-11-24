@@ -56,6 +56,25 @@ class UltimaOut(BaseModel):
     situacao: SituacaoOut
 
 
+class PrevisaoOut(BaseModel):
+    """status "ok" traz a previsão; nos demais, só `motivo` (sem erro HTTP)."""
+
+    status: Literal["ok", "dados_insuficientes", "modelo_indisponivel"]
+    device_id: str
+    gerado_em: datetime
+    motivo: str | None = None
+    itgu_atual: float | None = None
+    itgu_previsto: float | None = None
+    horizonte_min: int | None = None
+    classificacao: Literal["conforto", "alerta", "critico", "sem_faixa"] | None = None
+    referencia_ts: datetime | None = None  # início da última janela de 5 min usada
+    previsto_para: datetime | None = None  # início da janela de 5 min prevista (referencia + horizonte)
+    modelo: Literal["linear", "xgboost"] | None = None
+    origem: Literal["sintetico", "real"] | None = None
+    mae_teste: float | None = None
+    treinado_em: datetime | None = None
+
+
 class LeituraAgregadaOut(BaseModel):
     janela: datetime  # início do intervalo
     n: int  # leituras na janela

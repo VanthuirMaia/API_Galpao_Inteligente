@@ -1,2 +1,6 @@
 pytest
 httpx
+
+# treino do modelo nos testes (tests/api/test_previsao_xgboost_integracao.py roda ml/rodar.py)
+scikit-learn
+matplotlib

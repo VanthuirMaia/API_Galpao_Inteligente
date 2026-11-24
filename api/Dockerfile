@@ -8,6 +8,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ app/
 
+# código de features compartilhado com o treino (contexto "ml" definido no docker-compose.yml:
+# additional_contexts). Se for buildar sem o compose: docker build --build-context ml=../ml .
+COPY --from=ml features.py preparar.py modelo_io.py /srv/ml/
+ENV PYTHONPATH=/srv/ml
+
 # usuário não-root
 RUN useradd --system --no-create-home api
 USER api

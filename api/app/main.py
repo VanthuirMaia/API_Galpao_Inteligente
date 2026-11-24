@@ -10,6 +10,7 @@ from app.rotas_dispositivos import router as rotas_dispositivos
 from app.rotas_erros import router as rotas_erros
 from app.rotas_faixas import router as rotas_faixas
 from app.rotas_leituras import router as rotas_leituras
+from app.rotas_previsao import router as rotas_previsao
 from app.rotas_usuarios import router as rotas_usuarios
 
 
@@ -37,6 +38,7 @@ app.include_router(rotas_auth)
 app.include_router(rotas_dispositivos)
 app.include_router(rotas_faixas)
 app.include_router(rotas_leituras)
+app.include_router(rotas_previsao)
 app.include_router(rotas_erros)
 app.include_router(rotas_usuarios)
 

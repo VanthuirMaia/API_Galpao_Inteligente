@@ -285,3 +285,9 @@ body.legado > main { grid-column: 2; grid-row: 1; align-self: stretch; }
 .side-frase { margin: 0; }
 .nav-sair { display: none; }
 @media (max-width: 850px) { .nav-sair { display: flex; } }
+
+/* ---------- previsão do ITGU ---------- */
+.selo-teste { margin: 0; padding: .5rem .85rem; border: 1.5px dashed var(--warn-line); border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: .92rem; font-weight: 700; }
+.selo-teste::before { content: "⚠ "; }
+.leitura.destacado { border: 2px solid var(--acc); box-shadow: 0 0 0 4px var(--tint); }
+.leitura.destacado .action-text { color: var(--ink-s); font-weight: 700; }

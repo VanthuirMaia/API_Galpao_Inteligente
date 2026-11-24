@@ -32,6 +32,11 @@ def online_limite_s() -> int:
     return int(os.environ.get("ONLINE_LIMITE_S", "300"))
 
 
+def modelo_dir() -> str:
+    """Pasta com o modelo de previsão do ITGU (metadados.json + modelo_*.json), montada como volume."""
+    return os.environ.get("MODELO_DIR", "/srv/modelo")
+
+
 def cors_origins() -> list[str]:
     """Lista separada por vírgula; vazio = sem CORS."""
     bruto = os.environ.get("CORS_ORIGINS", "")

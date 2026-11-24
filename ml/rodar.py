@@ -1,6 +1,7 @@
 """Roda o pipeline inteiro: CSV -> preparo -> features -> treino -> saídas.
 
 Uso: uv run python rodar.py --csv caminho.csv [--saidas pasta] [--origem real|sintetico]
+                            [--salvar-modelo [--modelo-dir pasta] [--tipo auto|linear|xgboost] [--forcar]]
 """
 import argparse
 import json
@@ -14,7 +15,8 @@ matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from features import FUSO_LOCAL, HORIZONTE_MIN, LAGS_MIN, montar_features
+from features import FUSO_LOCAL, HORIZONTE_MIN, LAGS_MIN, PASSO_MIN, montar_features
+from modelo_io import ler_metadados, salvar_modelo
 from preparar import preparar
 from treinar import treinar
 
@@ -127,6 +129,36 @@ def montar_resumo(csv, origem, info, res):
     return "\n".join(linhas)
 
 
+def salvar_melhor_modelo(pasta, forcar, origem, csv, info, res, colunas, tipo="auto"):
+    """Salva em `pasta` o melhor entre linear e XGBoost pelo MAE no teste. Devolve os metadados.
+
+    `tipo` "linear" ou "xgboost" salva esse modelo em vez do melhor (útil para testar a troca).
+
+    Não deixa um modelo de dados sintéticos substituir um treinado com dados reais
+    (a menos que forcar=True).
+    """
+    atual = ler_metadados(pasta)
+    if atual and atual.get("origem") == "real" and origem == "sintetico" and not forcar:
+        raise SystemExit("Já existe um modelo treinado com dados REAIS em "
+                         f"{pasta}; um modelo sintético não o substitui sem --forcar.")
+
+    m = res["metricas"]
+    if tipo == "auto":
+        tipo = min(("linear", "xgboost"), key=lambda k: m[k]["mae"])
+    metadados = {
+        "features": list(colunas),
+        "horizonte_min": HORIZONTE_MIN, "lags_min": LAGS_MIN, "passo_min": PASSO_MIN,
+        "origem": origem, "arquivo_csv": Path(csv).name,
+        "mae_teste": m[tipo]["mae"], "rmse_teste": m[tipo]["rmse"],
+        "mae_persistencia_teste": m["persistencia"]["mae"],
+        "periodo_dados": {"inicio": info["inicio"].isoformat(), "fim": info["fim"].isoformat()},
+        "periodo_teste": {"inicio": res["teste_inicio"].isoformat(), "fim": res["teste_fim"].isoformat()},
+        "n_treino": res["n_treino"], "n_teste": res["n_teste"],
+        "pct_leituras_servidor": info["pct_servidor"],
+    }
+    return salvar_modelo(pasta, tipo, res["modelos"][tipo], metadados)
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")  # acentos no console do Windows
     pasta = Path(__file__).parent
@@ -135,6 +167,13 @@ def main():
     ap.add_argument("--saidas", default=str(pasta / "saidas"))
     ap.add_argument("--origem", choices=["real", "sintetico"],
                     help="padrão: 'sintetico' se o nome do arquivo contiver isso, senão 'real'")
+    ap.add_argument("--salvar-modelo", action="store_true",
+                    help="salva o melhor modelo (menor MAE) em --modelo-dir para a API usar")
+    ap.add_argument("--modelo-dir", default=str(pasta / "modelo"))
+    ap.add_argument("--tipo", choices=["auto", "linear", "xgboost"], default="auto",
+                    help="modelo a salvar; 'auto' = o de menor MAE no teste")
+    ap.add_argument("--forcar", action="store_true",
+                    help="permite um modelo sintético substituir um modelo treinado com dados reais")
     args = ap.parse_args()
 
     origem = detectar_origem(args.csv, args.origem)
@@ -161,12 +200,25 @@ def main():
                                           encoding="utf-8")
     grafico_previsto_real(res["previsoes"], origem, saidas / "previsto_x_real.png")
     grafico_importancia(res["importancias"], origem, saidas / "importancia_xgb.png")
-    (saidas / "resumo.md").write_text(montar_resumo(args.csv, origem, info, res), encoding="utf-8")
+    resumo = montar_resumo(args.csv, origem, info, res)
+    meta_modelo = None
+    if args.salvar_modelo:
+        meta_modelo = salvar_melhor_modelo(args.modelo_dir, args.forcar, origem, args.csv, info, res, X.columns, args.tipo)
+        resumo += "\n".join([
+            "", "## Modelo salvo para a API",
+            f"- Modelo: **{NOMES[meta_modelo['tipo']]}** ({'escolhido por --tipo' if args.tipo != 'auto' else 'menor MAE no teste'}, "
+            f"MAE {meta_modelo['mae_teste']:.3f})",
+            f"- Origem: **{origem}**; treinado em {meta_modelo['treinado_em']}", "",
+        ])
+    (saidas / "resumo.md").write_text(resumo, encoding="utf-8")
 
     print(f"Origem dos dados: {origem}")
     for k, v in res["metricas"].items():
         print(f"  {NOMES[k]:<17} MAE {v['mae']:.3f}  RMSE {v['rmse']:.3f}")
     print(f"Saídas em {saidas}")
+    if meta_modelo:
+        print(f"Modelo salvo em {args.modelo_dir}: {NOMES[meta_modelo['tipo']]} "
+              f"(MAE {meta_modelo['mae_teste']:.3f}, origem {origem})")
 
 
 if __name__ == "__main__":
