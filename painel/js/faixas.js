@@ -4,7 +4,7 @@ import {
   abrirDialogo, configurarDialogo, erroNoDialogo, fecharDialogo, linhaInfo, mostrarAviso,
   mostrarErroDialogo, mostrarErroPagina, semPermissao, textoDoErro,
 } from "./admin.js";
-import { el, numero } from "./formato.js";
+import { el, limitesDaEscala, numero, temLimite, textoConforto } from "./formato.js";
 import { montarLayout } from "./layout.js";
 import { exigirAdmin } from "./sessao.js";
 
@@ -25,22 +25,34 @@ const CAMPOS = {
   critico_min: "f-cmin", conforto_min: "f-mmin", conforto_max: "f-mmax", critico_max: "f-cmax",
 };
 
+const OPCIONAIS = ["critico_min", "conforto_min", "critico_max"]; // podem ficar vazios (sem limite)
+
 let faixas = [];
 let editandoId = null; // null = nova faixa
 let acaoConfirmada = null; // função chamada pelo botão Confirmar do diálogo de confirmação
 
 // ---------- régua e cobertura ----------
 
-/** Barra com as 5 zonas (crítico, alerta, conforto, alerta, crítico). O tamanho vem de --peso (CSSOM). */
+/** Barra com as zonas da faixa (crítico, alerta, conforto, alerta, crítico), só as que existem.
+ *  Sem conforto mínimo o conforto começa na ponta; sem crítico não há zona crítica daquele lado.
+ *  O tamanho de cada zona vem de --peso (CSSOM). */
 function regua(f) {
-  const margem = (f.critico_max - f.critico_min) * 0.2;
-  const pesos = [
-    ["critico", margem],
-    ["alerta", f.conforto_min - f.critico_min],
-    ["conforto", f.conforto_max - f.conforto_min],
-    ["alerta", f.critico_max - f.conforto_max],
-    ["critico", margem],
-  ];
+  const { min, max } = limitesDaEscala(f, 0.2);
+  const pesos = [];
+  let atual = min;
+  const zona = (classe, ate) => {
+    if (ate > atual) pesos.push([classe, ate - atual]);
+    atual = ate;
+  };
+  if (temLimite(f.critico_min)) zona("critico", f.critico_min);
+  if (temLimite(f.conforto_min)) zona("alerta", f.conforto_min);
+  zona("conforto", f.conforto_max);
+  if (temLimite(f.critico_max)) {
+    zona("alerta", f.critico_max);
+    zona("critico", max);
+  } else {
+    zona("alerta", max);
+  }
   const barra = el("div", "regua");
   barra.setAttribute("aria-hidden", "true");
   for (const [classe, peso] of pesos) {
@@ -82,10 +94,17 @@ function cartao(f) {
   const topo = el("div", "card-topo");
   topo.append(titulo, el("span", f.ativo ? "selo online" : "selo offline", f.ativo ? "Ativa" : "Inativa"));
   card.append(topo, regua(f));
-  card.append(
-    el("p", "sub", `Crítico abaixo de ${numero(f.critico_min, 1)} · Conforto de ${numero(f.conforto_min, 1)} a ${numero(f.conforto_max, 1)} · Crítico acima de ${numero(f.critico_max, 1)}`),
-    linhaInfo("Alerta", `de ${numero(f.critico_min, 1)} a ${numero(f.conforto_min, 1)} e de ${numero(f.conforto_max, 1)} a ${numero(f.critico_max, 1)}`),
-  );
+  // limite que a faixa não tem não aparece no texto
+  const resumo = [];
+  if (temLimite(f.critico_min)) resumo.push(`Crítico abaixo de ${numero(f.critico_min, 1)}`);
+  resumo.push(temLimite(f.conforto_min) ? `Conforto de ${numero(f.conforto_min, 1)} a ${numero(f.conforto_max, 1)}` : `Conforto até ${numero(f.conforto_max, 1)}`);
+  if (temLimite(f.critico_max)) resumo.push(`Crítico acima de ${numero(f.critico_max, 1)}`);
+  const alerta = [];
+  if (temLimite(f.conforto_min)) {
+    alerta.push(temLimite(f.critico_min) ? `de ${numero(f.critico_min, 1)} a ${numero(f.conforto_min, 1)}` : `abaixo de ${numero(f.conforto_min, 1)}`);
+  }
+  alerta.push(temLimite(f.critico_max) ? `de ${numero(f.conforto_max, 1)} a ${numero(f.critico_max, 1)}` : `acima de ${numero(f.conforto_max, 1)}`);
+  card.append(el("p", "sub", resumo.join(" · ")), linhaInfo("Alerta", alerta.join(" e ")));
 
   const editar = el("button", "botao-simples claro pequeno", "Editar");
   editar.type = "button";
@@ -129,7 +148,8 @@ function abrirFormulario(faixa) {
   editandoId = faixa ? faixa.id : null;
   document.getElementById("t-faixa").textContent = faixa ? "Editar faixa" : "Nova faixa";
   for (const [campo, id] of Object.entries(CAMPOS)) {
-    document.getElementById(id).value = faixa ? String(faixa[campo]) : "";
+    const valor = faixa ? faixa[campo] : null;
+    document.getElementById(id).value = temLimite(valor) ? String(valor) : ""; // limite nulo = campo vazio
   }
   abrirDialogo(dlgFaixa);
   document.getElementById("f-nome").focus();
@@ -141,15 +161,18 @@ function lerFormulario() {
   const numeros = {};
   for (const campo of Object.keys(CAMPOS).filter((c) => c !== "nome")) {
     const texto = document.getElementById(CAMPOS[campo]).value.trim();
-    numeros[campo] = texto === "" ? NaN : Number(texto);
+    // os três limites opcionais, se vazios, vão como null (sem limite)
+    numeros[campo] = texto === "" ? (OPCIONAIS.includes(campo) ? null : NaN) : Number(texto);
   }
   if (!nome) return { erro: "Informe o nome da faixa." };
-  if (Object.values(numeros).some((v) => Number.isNaN(v))) return { erro: "Preencha todos os números." };
+  if (Object.values(numeros).some((v) => Number.isNaN(v))) return { erro: "Preencha as idades e o conforto máximo; os demais limites podem ficar vazios." };
   const { idade_inicio_dias: ini, idade_fim_dias: fim, critico_min: cmin, conforto_min: mmin, conforto_max: mmax, critico_max: cmax } = numeros;
   if (!Number.isInteger(ini) || !Number.isInteger(fim) || ini < 0) return { erro: "As idades devem ser números inteiros, a partir de 0." };
   if (fim < ini) return { erro: "A idade fim deve ser maior ou igual à idade início." };
-  if (!(cmin < mmin && mmin < mmax && mmax < cmax)) {
-    return { erro: "Os limites devem obedecer: crítico mínimo < conforto mínimo < conforto máximo < crítico máximo." };
+  if (cmin !== null && mmin === null) return { erro: "O crítico mínimo só existe junto com o conforto mínimo." };
+  const ordem = [cmin, mmin, mmax, cmax].filter((v) => v !== null);
+  if (ordem.some((v, i) => i > 0 && v <= ordem[i - 1])) {
+    return { erro: "Os limites preenchidos devem obedecer: crítico mínimo < conforto mínimo < conforto máximo < crítico máximo." };
   }
   return { dados: { nome, ...numeros } };
 }

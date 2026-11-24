@@ -1,7 +1,7 @@
 // Histórico: gráficos de ITGU, temperaturas e umidade, resumo e exportação CSV.
 import { api, baixarArquivo } from "./api.js";
 import {
-  classificar, dataHoraCompleta, deInputLocal, diaHora, el, horaMinuto, numero, paraInputLocal,
+  classificar, dataHoraCompleta, deInputLocal, diaHora, el, horaMinuto, numero, paraInputLocal, temLimite,
 } from "./formato.js";
 import { montarLayout } from "./layout.js";
 import { exigirLogin } from "./sessao.js";
@@ -252,22 +252,27 @@ function desenhar(id, datasets, opcoes) {
   graficos[id] = new Chart(document.getElementById(id), { type: "line", data: { datasets }, options: opcoes });
 }
 
-/** Datasets extras da faixa de conforto: área verde e linhas críticas tracejadas (sem plugin). */
+/** Datasets extras da faixa de conforto: área verde e linhas críticas tracejadas (sem plugin).
+ *  Só desenha o que existe: sem conforto mínimo a área vai até a base do gráfico; limite crítico nulo não tem linha. */
 function datasetsFaixa(faixa, inicio, fim) {
   const reta = (y) => [{ x: inicio, y }, { x: fim, y }];
   const auxiliar = { pointRadius: 0, pointHoverRadius: 0, spanGaps: false, ocultarNoTooltip: true };
-  return [
-    { ...auxiliar, label: "conforto mínimo", data: reta(faixa.conforto_min), borderWidth: 0, ocultarNaLegenda: true },
-    {
-      ...auxiliar, label: `Conforto: faixa vigente hoje (${faixa.nome})`, data: reta(faixa.conforto_max),
-      borderColor: "rgba(47, 158, 68, 0.6)", borderWidth: 1, backgroundColor: "rgba(47, 158, 68, 0.18)", fill: "-1",
-    },
-    {
-      ...auxiliar, label: `Limites críticos (${numero(faixa.critico_min, 1)} e ${numero(faixa.critico_max, 1)})`,
-      data: reta(faixa.critico_min), borderColor: COR.critico, borderDash: [6, 4], borderWidth: 1.5,
-    },
-    { ...auxiliar, label: "limite crítico superior", data: reta(faixa.critico_max), borderColor: COR.critico, borderDash: [6, 4], borderWidth: 1.5, ocultarNaLegenda: true },
-  ];
+  const temMinimo = temLimite(faixa.conforto_min);
+  const datasets = [];
+  if (temMinimo) datasets.push({ ...auxiliar, label: "conforto mínimo", data: reta(faixa.conforto_min), borderWidth: 0, ocultarNaLegenda: true });
+  datasets.push({
+    ...auxiliar, label: `Conforto: faixa vigente hoje (${faixa.nome})`, data: reta(faixa.conforto_max),
+    borderColor: "rgba(47, 158, 68, 0.6)", borderWidth: 1, backgroundColor: "rgba(47, 158, 68, 0.18)", fill: temMinimo ? "-1" : "start",
+  });
+  const criticos = [faixa.critico_min, faixa.critico_max].filter(temLimite);
+  criticos.forEach((y, i) => {
+    const rotulo = criticos.length === 2 ? `Limites críticos (${numero(criticos[0], 1)} e ${numero(criticos[1], 1)})` : `Limite crítico (${numero(y, 1)})`;
+    datasets.push({
+      ...auxiliar, label: i === 0 ? rotulo : "limite crítico superior", data: reta(y), borderColor: COR.critico,
+      borderDash: [6, 4], borderWidth: 1.5, ocultarNaLegenda: i > 0,
+    });
+  });
+  return datasets;
 }
 
 function desenharGraficos(linhas, agregado, faixa, inicio, fim) {

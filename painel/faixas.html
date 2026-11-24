@@ -46,11 +46,11 @@
           <input id="f-fim" type="number" min="0" step="1" inputmode="numeric">
         </div>
         <div>
-          <label for="f-cmin">Crítico mínimo</label>
+          <label for="f-cmin">Crítico mínimo <span class="opcional">(opcional)</span></label>
           <input id="f-cmin" type="number" step="any" inputmode="decimal">
         </div>
         <div>
-          <label for="f-mmin">Conforto mínimo</label>
+          <label for="f-mmin">Conforto mínimo <span class="opcional">(opcional)</span></label>
           <input id="f-mmin" type="number" step="any" inputmode="decimal">
         </div>
         <div>
@@ -58,11 +58,11 @@
           <input id="f-mmax" type="number" step="any" inputmode="decimal">
         </div>
         <div>
-          <label for="f-cmax">Crítico máximo</label>
+          <label for="f-cmax">Crítico máximo <span class="opcional">(opcional)</span></label>
           <input id="f-cmax" type="number" step="any" inputmode="decimal">
         </div>
       </div>
-      <p class="ajuda">Precisa valer: crítico mínimo &lt; conforto mínimo &lt; conforto máximo &lt; crítico máximo. As idades são em dias de vida e incluem as duas pontas (o dia do alojamento é a idade 0).</p>
+      <p class="ajuda">Precisa valer, nos limites preenchidos: crítico mínimo &lt; conforto mínimo &lt; conforto máximo &lt; crítico máximo. Deixe vazio o limite que não existe para a fase (o conforto máximo é obrigatório). As idades são em dias de vida e incluem as duas pontas (o dia do alojamento é a idade 0).</p>
       <p class="msg erro erro-dialogo" role="alert" hidden></p>
       <div class="acoes-form">
         <button type="button" class="botao-simples claro" data-fechar>Cancelar</button>

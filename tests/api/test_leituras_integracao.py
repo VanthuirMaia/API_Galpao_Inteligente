@@ -47,7 +47,7 @@ DADOS = gerar_dados()  # índice = minutos atrás
 @pytest.fixture(scope="module")
 def conn():
     with psycopg.connect(URL, autocommit=True) as c:
-        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql"):
+        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql", "005_faixas_limites_opcionais.sql"):
             c.execute((DB / arq).read_text(encoding="utf-8"))
         c.execute("TRUNCATE galpao.leituras, galpao.erros_ingestao, galpao.usuarios RESTART IDENTITY")
         c.execute("UPDATE galpao.dispositivos SET ativo = true")

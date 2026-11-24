@@ -1,7 +1,7 @@
 // Painel Nexar (index.html): início, galpão, histórico, alertas e configurações numa página só.
 // As outras telas (diagnóstico, conta, administração) continuam em páginas próprias.
 import { api, login } from "./api.js";
-import { ambienteRotulo, dataCurta, dataHora, diasRotulo, el, haQuanto, hojeRecifeISO, hora, horaMinuto, numero } from "./formato.js";
+import { ambienteRotulo, dataCurta, dataHora, diasRotulo, el, haQuanto, hojeRecifeISO, hora, horaMinuto, limitesDaEscala, numero, temLimite, textoConforto } from "./formato.js";
 import { montarRodape } from "./layout.js";
 import { lerSessao, limparSessao, salvarSessao, sair } from "./sessao.js";
 
@@ -145,11 +145,14 @@ function dispositivoAtual() {
 const ESTADOS = ["danger", "safe", "caution", "sem-dado"];
 const ESTADO_DA_CLASSE = { conforto: "safe", alerta: "caution", critico: "danger", sem_faixa: "caution" };
 
-/** Posições (em %) da faixa verde e do marcador numa escala azul-verde-amarelo-vermelho. */
-function montarEscala(lo, hi, valor, confMin, confMax) {
+/** Posições (em %) da faixa verde e do marcador numa escala azul-verde-amarelo-vermelho.
+ *  Sem conforto mínimo o verde começa na ponta; sem crítico máximo a escala termina no amarelo. */
+function montarEscala(faixa, valor) {
+  const { min: lo, max: hi } = limitesDaEscala(faixa);
   const pct = (x) => Math.max(0, Math.min(100, ((x - lo) / (hi - lo)) * 100));
-  const p2 = pct(confMax);
-  return { p1: pct(confMin), p2, p3: p2 + (100 - p2) / 2, pos: Math.max(2, Math.min(98, pct(valor))) };
+  const p2 = pct(faixa.conforto_max);
+  const p3 = temLimite(faixa.critico_max) ? p2 + (100 - p2) / 2 : 100;
+  return { p1: temLimite(faixa.conforto_min) ? pct(faixa.conforto_min) : 0, p2, p3, pos: Math.max(2, Math.min(98, pct(valor))) };
 }
 
 function preencherLeitura(id, d) {
@@ -184,7 +187,7 @@ function direcao(leitura, situacao) {
   const f = situacao && situacao.faixa;
   if (!f || situacao.classificacao === "conforto") return null;
   if (leitura.itgu > f.conforto_max) return "quente";
-  if (leitura.itgu < f.conforto_min) return "frio";
+  if (temLimite(f.conforto_min) && leitura.itgu < f.conforto_min) return "frio";
   return null;
 }
 
@@ -206,17 +209,13 @@ function cartaoTemperatura(leitura, situacao) {
   const classe = situacao.classificacao || "sem_faixa";
   const t = textoTemperatura(classe, direcao(leitura, situacao));
   const f = situacao.faixa;
-  let escalaTemp = null;
-  if (f) {
-    const folga = (f.critico_max - f.critico_min) * 0.4;
-    escalaTemp = montarEscala(f.critico_min - folga, f.critico_max + folga, leitura.itgu, f.conforto_min, f.conforto_max);
-  }
+  const escalaTemp = f ? montarEscala(f, leitura.itgu) : null;
   const ext = leitura.t_ext === null || leitura.t_ext === undefined ? "Sem sinal" : `${numero(leitura.t_ext, 1)} °C`;
   preencherLeitura("m-temp", {
     estado: ESTADO_DA_CLASSE[classe],
     valor: numero(leitura.t_int, 1),
     unidade: "°C",
-    faixa: f ? `${numero(f.conforto_min, 1)} – ${numero(f.conforto_max, 1)}` : "Sem faixa",
+    faixa: f ? textoConforto(f) : "Sem faixa",
     extra: ext,
     escala: escalaTemp,
     legenda: `ITGU atual: ${numero(leitura.itgu, 1)}`,
@@ -652,7 +651,7 @@ function mostrarPrevisao(p, d) {
   campo("valor").removeAttribute("aria-label");
   campo("pill").textContent = texto.pill;
   campo("atual").textContent = numero(p.itgu_atual, 1);
-  campo("faixa").textContent = faixa ? `${numero(faixa.conforto_min, 1)} – ${numero(faixa.conforto_max, 1)}` : "Sem faixa";
+  campo("faixa").textContent = faixa ? textoConforto(faixa) : "Sem faixa";
   campo("hora").textContent = horaMinuto(new Date(p.previsto_para).getTime());
   campo("acao").textContent = fraseDaPrevisao(p.classificacao_atual, classe);
   campo("nota").textContent =

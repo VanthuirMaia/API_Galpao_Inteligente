@@ -11,10 +11,10 @@ SENHA_MIN = 10
 class FaixaResumoOut(BaseModel):
     id: int
     nome: str
-    critico_min: float
-    conforto_min: float
+    critico_min: float | None  # nulo = sem limite
+    conforto_min: float | None
     conforto_max: float
-    critico_max: float
+    critico_max: float | None
 
 
 class SituacaoOut(BaseModel):
@@ -212,7 +212,13 @@ def erro_faixa(f: dict) -> str | None:
     """Mensagem de erro se idades ou limites da faixa estão fora de ordem; senão None."""
     if f["idade_fim_dias"] < f["idade_inicio_dias"]:
         return "idade_fim_dias deve ser >= idade_inicio_dias"
-    if not f["critico_min"] < f["conforto_min"] < f["conforto_max"] < f["critico_max"]:
+    if f["conforto_max"] is None:
+        return "conforto_max é obrigatório"
+    if f["critico_min"] is not None and f["conforto_min"] is None:
+        return "critico_min exige conforto_min"
+    # os limites informados (nulo = não existe) devem crescer nesta ordem
+    ordem = [f[c] for c in ("critico_min", "conforto_min", "conforto_max", "critico_max") if f[c] is not None]
+    if any(a >= b for a, b in zip(ordem, ordem[1:])):
         return "limites devem obedecer critico_min < conforto_min < conforto_max < critico_max"
     return None
 
@@ -221,10 +227,10 @@ class FaixaIn(BaseModel):
     nome: str = Field(min_length=1)
     idade_inicio_dias: int = Field(ge=0)
     idade_fim_dias: int = Field(ge=0)
-    critico_min: float
-    conforto_min: float
+    critico_min: float | None = None  # os limites críticos e o conforto mínimo são opcionais
+    conforto_min: float | None = None
     conforto_max: float
-    critico_max: float
+    critico_max: float | None = None
 
     @model_validator(mode="after")
     def _ordem(self):
@@ -247,7 +253,9 @@ class FaixaPatch(BaseModel):
     @model_validator(mode="after")
     def _validar(self):
         # a ordem dos limites é checada na rota, com os valores atuais dos campos não enviados
-        return _exigir_campos(self, tuple(type(self).model_fields))
+        # critico_min, conforto_min e critico_max aceitam null (apagam o limite)
+        obrigatorios = tuple(c for c in type(self).model_fields if c not in ("critico_min", "conforto_min", "critico_max"))
+        return _exigir_campos(self, obrigatorios)
 
 
 class FaixaOut(BaseModel):
@@ -255,9 +263,9 @@ class FaixaOut(BaseModel):
     nome: str
     idade_inicio_dias: int
     idade_fim_dias: int
-    critico_min: float
-    conforto_min: float
+    critico_min: float | None
+    conforto_min: float | None
     conforto_max: float
-    critico_max: float
+    critico_max: float | None
     ativo: bool
     criado_em: datetime

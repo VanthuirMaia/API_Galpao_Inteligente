@@ -24,7 +24,7 @@ AGORA = lambda: datetime.now(timezone.utc)  # noqa: E731
 @pytest.fixture(scope="module")
 def conn():
     with psycopg.connect(URL, autocommit=True) as c:
-        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql"):
+        for arq in ("001_init.sql", "002_permissoes.sql", "003_usuarios_api.sql", "004_faixas_itgu.sql", "005_faixas_limites_opcionais.sql"):
             c.execute((DB / arq).read_text(encoding="utf-8"))
         yield c
 
@@ -84,10 +84,11 @@ def alojar(client, device_id, dias_atras, **extra):
 
 # ---------- migração ----------
 
-def test_004_idempotente_e_sem_btree_gist(conn):
-    sql = (DB / "004_faixas_itgu.sql").read_text(encoding="utf-8")
-    conn.execute(sql)
-    conn.execute(sql)
+def test_004_e_005_idempotentes_e_sem_btree_gist(conn):
+    for arq in ("004_faixas_itgu.sql", "005_faixas_limites_opcionais.sql"):
+        sql = (DB / arq).read_text(encoding="utf-8")
+        conn.execute(sql)
+        conn.execute(sql)
     # a constraint de exclusão com range funciona sem a extensão btree_gist
     assert conn.execute("SELECT count(*) FROM pg_extension WHERE extname = 'btree_gist'").fetchone()[0] == 0
 
@@ -175,6 +176,70 @@ def test_desativar_faixa_em_uso_manual_409(client):
     # liberando o dispositivo, pode desativar
     client.patch("/dispositivos/esp01", json={"faixa_manual_id": None}, headers=ADMIN())
     assert client.patch(f"/faixas/{f['id']}", json={"ativo": False}, headers=ADMIN()).status_code == 200
+
+
+# ---------- limites opcionais (nulos) ----------
+
+def test_faixa_sem_limites_opcionais(client):
+    adulta = criar_faixa(client, "Adulta", 43, 1000, cmin=None, min_=None, max_=75, cmax=78)
+    assert (adulta["critico_min"], adulta["conforto_min"], adulta["conforto_max"], adulta["critico_max"]) == (None, None, 75, 78)
+    cria = criar_faixa(client, "Cria", 0, 7, cmin=None, min_=83, max_=89, cmax=None)
+    assert (cria["critico_min"], cria["conforto_min"], cria["conforto_max"], cria["critico_max"]) == (None, 83, 89, None)
+    listadas = {f["nome"]: f for f in client.get("/faixas", headers=LEITOR()).json()}
+    assert listadas["Cria"]["critico_max"] is None and listadas["Adulta"]["conforto_min"] is None
+
+
+def test_limites_opcionais_podem_ser_omitidos(client):
+    corpo = {"nome": "so conforto max", "idade_inicio_dias": 0, "idade_fim_dias": 7, "conforto_max": 80}
+    r = client.post("/faixas", json=corpo, headers=ADMIN())
+    assert r.status_code == 201
+    assert (r.json()["critico_min"], r.json()["conforto_min"], r.json()["critico_max"]) == (None, None, None)
+
+
+@pytest.mark.parametrize("corpo", [
+    faixa_json("x", 0, 7, cmin=60, min_=None),                    # crítico mínimo sem conforto mínimo
+    faixa_json("x", 0, 7, cmin=None, min_=None, max_=80, cmax=79),  # crítico máximo abaixo do conforto máximo
+    faixa_json("x", 0, 7, cmin=None, min_=80, max_=80, cmax=None),  # conforto mínimo == máximo
+    faixa_json("x", 0, 7, max_=None),                              # conforto máximo é obrigatório
+])
+def test_limites_nulos_invalidos_422(client, corpo):
+    assert client.post("/faixas", json=corpo, headers=ADMIN()).status_code == 422
+
+
+def test_banco_rejeita_limites_fora_de_ordem_mesmo_com_nulos(conn):
+    insert = ("INSERT INTO galpao.faixas_itgu (nome, idade_inicio_dias, idade_fim_dias, critico_min, conforto_min, "
+              "conforto_max, critico_max) VALUES ('x', 0, 7, %s, %s, %s, %s)")
+    conn.execute("DELETE FROM galpao.faixas_itgu")
+    for limites in [(60, None, 80, None), (None, 80, 80, None), (None, None, 80, 79)]:
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(insert, limites)
+    conn.execute(insert, (None, None, 75, 78))  # o caso das poedeiras adultas é válido
+    conn.execute("DELETE FROM galpao.faixas_itgu")
+
+
+def test_patch_apaga_e_recoloca_limite(client):
+    f = criar_faixa(client, "A", 0, 7)  # crítico 65, conforto 70–77, crítico 82
+    r = client.patch(f"/faixas/{f['id']}", json={"critico_max": None}, headers=ADMIN())
+    assert r.status_code == 200 and r.json()["critico_max"] is None
+    r = client.patch(f"/faixas/{f['id']}", json={"critico_max": 85}, headers=ADMIN())
+    assert r.status_code == 200 and r.json()["critico_max"] == 85
+    # conforto_min só pode sair se o crítico_min sair junto
+    assert client.patch(f"/faixas/{f['id']}", json={"conforto_min": None}, headers=ADMIN()).status_code == 422
+    r = client.patch(f"/faixas/{f['id']}", json={"conforto_min": None, "critico_min": None}, headers=ADMIN())
+    assert r.status_code == 200 and r.json()["conforto_min"] is None and r.json()["critico_min"] is None
+    # campos obrigatórios continuam sem aceitar null
+    assert client.patch(f"/faixas/{f['id']}", json={"conforto_max": None}, headers=ADMIN()).status_code == 422
+    assert client.patch(f"/faixas/{f['id']}", json={"nome": None}, headers=ADMIN()).status_code == 422
+
+
+def test_classificacao_com_limites_nulos(client, conn):
+    criar_faixa(client, "Adulta", 43, 1000, cmin=None, min_=None, max_=75, cmax=78)
+    assert alojar(client, "esp01", 100).status_code == 200
+    for i, (itgu, classe) in enumerate([(74.9, "conforto"), (60.0, "conforto"), (76.0, "alerta"), (78.1, "critico")]):
+        inserir_leitura(conn, "esp01", itgu, AGORA() + timedelta(seconds=i))
+        sit = client.get("/dispositivos/esp01/ultima", headers=LEITOR()).json()["situacao"]
+        assert sit["classificacao"] == classe
+        assert sit["faixa"]["conforto_min"] is None and sit["faixa"]["critico_min"] is None
 
 
 # ---------- dispositivos: alojamento, faixa manual e situação ----------

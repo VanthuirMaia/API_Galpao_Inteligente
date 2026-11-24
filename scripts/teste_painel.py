@@ -22,6 +22,10 @@ LEITOR = (os.environ.get("LEITOR_EMAIL", "leitor@galpao.dev"), os.environ.get("L
 NOVA_SENHA = "nova-senha-dev-67890"
 CAPTURAS = Path(__file__).resolve().parent.parent / "capturas"
 RODAPE = "Projeto desenvolvido no Espaço CRIA da ETEGEC com apoio da FACEPE, processo ARC-0572-1.03/26."
+# faixas de poedeiras (scripts/aplicar_faixas_poedeiras.py), aplicadas pelo gerar_dados_dev.py
+FAIXA_CRIA_1 = "Poedeiras · Cria 1ª semana (Andrade et al., 2019)"
+FAIXA_CRIA_2 = "Poedeiras · Cria 2ª semana (Andrade et al., 2019)"
+FAIXA_ADULTA = "Poedeiras · Recria e produção (Tinôco, 1998; Baêta e Souza, 2010)"
 ITENS_ADMIN = {"Dispositivos", "Faixas de ITGU", "Usuários"}
 CLASSES = ("Conforto", "Alerta", "Crítico", "Sem faixa definida")
 RECIFE = ZoneInfo("America/Recife")
@@ -82,13 +86,15 @@ def testar_historico(page) -> None:
     item("histórico: 24 h usa dados brutos", "dados brutos" in page.inner_text("#agregacao"), page.inner_text("#agregacao"))
     page.screenshot(path=str(CAPTURAS / "historico_1280.png"), full_page=True)
 
-    # esp01: sem faixa
+    # esp01: lote de 100 dias, faixa de adultas (sem conforto mínimo nem crítico mínimo)
     page.select_option("#dispositivo", "esp01")
     esperar_estado(page)
-    item("esp01: aviso 'sem faixa definida'", page.locator("#aviso-faixa").is_visible() and "Sem faixa definida" in page.inner_text("#aviso-faixa"))
-    item("esp01: sem percentuais de conforto", "% do tempo em conforto" not in page.inner_text("#resumo"))
+    item("esp01: com faixa, sem aviso", not page.locator("#aviso-faixa").is_visible())
+    item("esp01: percentuais de conforto", "% do tempo em conforto" in page.inner_text("#resumo"))
+    rotulos = rotulos_grafico(page, "grafico-itgu")
+    item("esp01: gráfico só desenha o limite crítico que existe", any("Limite crítico (78,0)" in r for r in rotulos) and not any("Limites críticos" in r or "conforto mínimo" in r for r in rotulos), "; ".join(rotulos))
 
-    # esp02: faixa, 7 dias e lacuna de 2 h
+    # esp02: faixa da 2ª semana (sem limites críticos), 7 dias e lacuna de 2 h
     page.select_option("#dispositivo", "esp02")
     page.click("[data-periodo='7d']")
     esperar_estado(page)
@@ -96,9 +102,9 @@ def testar_historico(page) -> None:
     resumo = page.inner_text("#resumo")
     item("esp02: resumo com maior lacuna de ~120 min", "120 min" in resumo.replace("\n", " "), re.sub(r"\s+", " ", resumo)[:160])
     item("esp02: % de conforto/alerta/crítico no resumo", all(t in resumo for t in ("% do tempo em conforto", "% do tempo em alerta", "% do tempo em crítico")))
-    item("esp02: nota explica o cálculo com a faixa vigente hoje", "faixa vigente hoje (EXEMPLO - Semana 3)" in page.inner_text("#nota-resumo"))
+    item("esp02: nota explica o cálculo com a faixa vigente hoje", f"faixa vigente hoje ({FAIXA_CRIA_2})" in page.inner_text("#nota-resumo"))
     rotulos = rotulos_grafico(page, "grafico-itgu")
-    item("esp02: área de conforto e limites críticos no gráfico", any("faixa vigente hoje (EXEMPLO - Semana 3)" in r for r in rotulos) and any("Limites críticos" in r for r in rotulos), "; ".join(rotulos))
+    item("esp02: área de conforto e nenhuma linha crítica (a faixa não tem limites críticos)", any(f"faixa vigente hoje ({FAIXA_CRIA_2})" in r for r in rotulos) and not any("rítico" in r for r in rotulos), "; ".join(rotulos))
     item("esp02: sem aviso de faixa", not page.locator("#aviso-faixa").is_visible())
     tem_quebra = page.evaluate("Chart.getChart('grafico-itgu').data.datasets[0].data.some(p => p.y === null)")
     item("lacuna vira ponto nulo (a linha quebra)", tem_quebra)
@@ -272,15 +278,23 @@ def testar_dispositivos(page, sufixo: str) -> str:
     esperar_dialogo_fechado(page, "#dlg-editar")
     page.wait_for_selector("#aviso-ok:not([hidden])")
     texto = card_por_texto(page, device).inner_text()
-    item("lista mostra idade e faixa pela idade", "10 dias" in texto and "EXEMPLO - Semana 2" in texto and "pela idade" in texto, re.sub(r"\s+", " ", texto)[:150])
+    item("lista mostra idade e faixa pela idade", "10 dias" in texto and FAIXA_CRIA_2 in texto and "pela idade" in texto, re.sub(r"\s+", " ", texto)[:150])
+
+    # 20 dias: não há ITGU publicado para 15 a 42 dias, então fica sem faixa
+    editar()
+    page.fill("#ed-data", (datetime.now(RECIFE) - timedelta(days=20)).date().isoformat())
+    page.click("#form-editar button[type=submit]")
+    esperar_dialogo_fechado(page, "#dlg-editar")
+    page.wait_for_function(f"() => document.querySelector(\"article.card[data-id='{device}']\").innerText.includes('20 dias')")
+    item("lote de 20 dias fica sem faixa", "sem faixa definida" in card_por_texto(page, device).inner_text().lower())
 
     # faixa manual
     editar()
-    page.select_option("#ed-faixa", label="EXEMPLO - Semana 1 (0 a 7 dias)")
+    page.select_option("#ed-faixa", label=f"{FAIXA_CRIA_1} (0 a 7 dias)")
     page.click("#form-editar button[type=submit]")
     esperar_dialogo_fechado(page, "#dlg-editar")
     page.wait_for_function(f"() => document.querySelector(\"article.card[data-id='{device}']\").innerText.includes('escolhida à mão')")
-    item("faixa manual vale acima da idade", "EXEMPLO - Semana 1" in card_por_texto(page, device).inner_text())
+    item("faixa manual vale acima da idade", FAIXA_CRIA_1 in card_por_texto(page, device).inner_text())
 
     # data futura é barrada no front
     editar()
@@ -319,16 +333,22 @@ def testar_faixas(page, sufixo: str, device: str) -> None:
     nome = f"Teste {sufixo}"
     page.goto(f"{BASE}/faixas.html")
     page.wait_for_selector("article.card")
-    item("faixas: cobertura completa das faixas de exemplo", "Todas as idades de 0 a 21" in page.inner_text("#cobertura"), page.inner_text("#cobertura"))
+    item("faixas: cobertura mostra a lacuna de 15 a 42 dias", "idades 15 a 42" in page.inner_text("#cobertura"), page.inner_text("#cobertura"))
     zonas = page.locator("article.card .regua .zona")
-    item("faixas: régua com 5 zonas por faixa", zonas.count() >= 15, f"{zonas.count()} zonas")
+    item("faixas: régua só com as zonas que existem", zonas.count() >= 15, f"{zonas.count()} zonas")
+    # limite que a faixa não tem não aparece em nenhum texto (nada de "crítico acima de -", null ou NaN)
+    adulta = card_por_texto(page, "Recria e produção").inner_text()
+    item("faixas: adulta mostra só conforto até 75,0 e crítico acima de 78,0", "Conforto até 75,0" in adulta and "Crítico acima de 78,0" in adulta and "Crítico abaixo" not in adulta, re.sub(r"\s+", " ", adulta)[:160])
+    cria = card_por_texto(page, "Cria 1ª semana").inner_text()
+    item("faixas: cria mostra só o conforto", "Conforto de 83,0 a 89,0" in cria and "Crítico" not in cria, re.sub(r"\s+", " ", cria)[:160])
+    item("faixas: nenhum texto com null, NaN ou undefined", not re.search(r"null|NaN|undefined", page.inner_text("main")))
     peso = page.evaluate("getComputedStyle(document.querySelector('article.card .regua .zona:nth-child(2)')).flexGrow")
     item("faixas: tamanho da zona vem de --peso (CSSOM)", float(peso) > 0 and float(peso) != 1.0, f"flex-grow={peso}")
 
     def preencher(nome_, ini, fim, cmin, mmin, mmax, cmax):
         page.fill("#f-nome", nome_)
         for campo, valor in (("ini", ini), ("fim", fim), ("cmin", cmin), ("mmin", mmin), ("mmax", mmax), ("cmax", cmax)):
-            page.fill(f"#f-{campo}", str(valor))
+            page.fill(f"#f-{campo}", "" if valor is None else str(valor))  # None = limite opcional vazio
 
     # limites fora de ordem barrados no front
     page.click("#btn-nova")
@@ -338,14 +358,18 @@ def testar_faixas(page, sufixo: str, device: str) -> None:
     preencher(nome, 30, 25, 60, 65, 75, 80)
     page.click("#form-faixa button[type=submit]")
     item("idade fim < início é barrada no front", "idade fim" in page.inner_text("#dlg-faixa .erro-dialogo"))
+    preencher(nome, 25, 30, 60, None, 75, 80)
+    page.click("#form-faixa button[type=submit]")
+    item("crítico mínimo sem conforto mínimo é barrado no front", "só existe junto" in page.inner_text("#dlg-faixa .erro-dialogo"))
 
-    # criar com lacuna (25 a 30; as idades 22 a 24 ficam sem faixa)
-    preencher(nome, 25, 30, 60, 65, 75, 80)
+    # criar só com conforto máximo e crítico máximo (25 a 30; as idades 15 a 24 e 31 a 42 ficam sem faixa)
+    preencher(nome, 25, 30, None, None, 75, 80)
     page.click("#form-faixa button[type=submit]")
     esperar_dialogo_fechado(page, "#dlg-faixa")
     page.wait_for_selector(f"article.card:has-text('{nome}')")
     item("faixa criada aparece na lista", True)
-    item("cobertura mostra a lacuna 22 a 24", "idades 22 a 24" in page.inner_text("#cobertura"), page.inner_text("#cobertura"))
+    item("cobertura mostra as lacunas 15 a 24 e 31 a 42", "idades 15 a 24" in page.inner_text("#cobertura") and "idades 31 a 42" in page.inner_text("#cobertura"), page.inner_text("#cobertura"))
+    item("faixa criada sem limites opcionais mostra só o que existe", "Conforto até 75,0" in card_por_texto(page, nome).inner_text())
 
     # sobreposição: 409 da API no formulário
     page.click("#btn-nova")
@@ -356,7 +380,7 @@ def testar_faixas(page, sufixo: str, device: str) -> None:
     page.click("#dlg-faixa .acoes-form [data-fechar]")
 
     # desativar faixa em uso manual: 409 com o id do dispositivo
-    card_por_texto(page, "EXEMPLO - Semana 1").locator("[data-acao='alternar']").click()
+    card_por_texto(page, "Cria 1ª semana").locator("[data-acao='alternar']").click()
     page.wait_for_selector("#dlg-confirma[open]")
     page.click("#confirma-ok")
     page.wait_for_function("() => !document.querySelector('#dlg-confirma .erro-dialogo').hidden")
@@ -570,8 +594,9 @@ def main() -> None:
             item(f"{device}: números com vírgula decimal (pt-BR)", bool(re.search(r"\d,\d", texto)))
             item(f"{device}: 'Última leitura há ...'", "Última leitura há" in texto)
         texto02 = page.inner_text("article.card[data-id='esp02']")
-        item("esp02: idade do lote e nome da faixa", "Lote com 20 dias" in texto02 and "EXEMPLO - Semana 3" in texto02)
-        item("esp01: sem faixa definida", "sem faixa definida" in page.inner_text("article.card[data-id='esp01']").lower())
+        item("esp02: idade do lote, faixa e conforto", "Lote com 10 dias" in texto02 and FAIXA_CRIA_2 in texto02 and "Conforto: 77,0 a 81,0" in texto02, re.sub(r"\s+", " ", texto02)[:200])
+        texto01 = page.inner_text("article.card[data-id='esp01']")
+        item("esp01: idade do lote, faixa e conforto sem limite inferior", "Lote com 100 dias" in texto01 and FAIXA_ADULTA in texto01 and "Conforto: até 75,0" in texto01, re.sub(r"\s+", " ", texto01)[:200])
         item("indicador 'atualizado às'", bool(re.search(r"atualizado às \d\d:\d\d", page.inner_text("#atualizado"))))
         item("rodapé obrigatório", page.inner_text("#rodape").strip() == RODAPE)
         itens = itens_menu(page)

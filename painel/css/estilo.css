@@ -175,3 +175,4 @@ dialog label:first-of-type { margin-top: 0; }
 .zona.conforto { background: #25b866; }
 
 .sem-margem { margin: 0; }
+.opcional { font-weight: 400; font-size: .85em; color: var(--muted); }

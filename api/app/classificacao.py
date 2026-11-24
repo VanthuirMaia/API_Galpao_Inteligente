@@ -38,12 +38,14 @@ def escolher_faixa(dispositivo: dict, faixas_ativas: list[dict], hoje: date):
 
 
 def classificar(itgu: float, faixa: dict | None) -> str:
-    """"conforto" | "alerta" | "critico" | "sem_faixa"."""
+    """"conforto" | "alerta" | "critico" | "sem_faixa". Limite nulo = não existe (nunca é violado)."""
     if faixa is None:
         return "sem_faixa"
-    if faixa["conforto_min"] <= itgu <= faixa["conforto_max"]:
+    minimo, maximo = faixa["conforto_min"], faixa["conforto_max"]
+    if (minimo is None or itgu >= minimo) and itgu <= maximo:
         return "conforto"
-    if itgu < faixa["critico_min"] or itgu > faixa["critico_max"]:
+    critico_min, critico_max = faixa["critico_min"], faixa["critico_max"]
+    if (critico_min is not None and itgu < critico_min) or (critico_max is not None and itgu > critico_max):
         return "critico"
     return "alerta"
 

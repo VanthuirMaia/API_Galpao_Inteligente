@@ -16,9 +16,9 @@ O PostgreSQL roda direto no host (localhost:5432) e não é alterado pelo projet
    ```
    git clone <URL_DO_REPOSITORIO> galpao-api && cd galpao-api
    ```
-2. Criar o banco `galpao` e aplicar `001` a `004` (como `postgres`; se a VPS já tem as primeiras aplicadas, rode só as novas, em ordem, com `sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao -f db/004_faixas_itgu.sql`; a 004 faz os usuários já logados precisarem entrar de novo):
+2. Criar o banco `galpao` e aplicar `001` a `005` (como `postgres`; se a VPS já tem as primeiras aplicadas, rode só as novas, em ordem, com `sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao -f db/005_faixas_limites_opcionais.sql`; a 004 faz os usuários já logados precisarem entrar de novo):
    ```
-   sudo -u postgres createdb galpao && cat db/001_init.sql db/002_permissoes.sql db/003_usuarios_api.sql db/004_faixas_itgu.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
+   sudo -u postgres createdb galpao && cat db/001_init.sql db/002_permissoes.sql db/003_usuarios_api.sql db/004_faixas_itgu.sql db/005_faixas_limites_opcionais.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
    ```
 3. Definir as senhas das roles `galpao_ingestor` e `galpao_api` (hex, para não quebrar a URL do banco) e anotá-las:
    ```
@@ -63,9 +63,9 @@ A API roda em container, publicada pelo Traefik que já existe na VPS (rede exte
    ```
    git pull
    ```
-2. Aplicar `003` e `004` no banco `galpao` (como `postgres`; a 004 faz os usuários já logados precisarem entrar de novo):
+2. Aplicar `003`, `004` e `005` no banco `galpao` (como `postgres`; a 004 faz os usuários já logados precisarem entrar de novo):
    ```
-   cat db/003_usuarios_api.sql db/004_faixas_itgu.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
+   cat db/003_usuarios_api.sql db/004_faixas_itgu.sql db/005_faixas_limites_opcionais.sql | sudo -u postgres psql -v ON_ERROR_STOP=1 -d galpao
    ```
 3. Definir a senha da role `galpao_api` e guardá-la em `/root/galpao_senhas.txt`:
    ```
@@ -118,6 +118,29 @@ Notas:
 - Como o painel é estático (sem build), uma atualização de HTML, CSS ou JS só precisa de `git pull`: os arquivos são montados no container. O navegador revalida `.css`, `.js` e `.html` a cada acesso (sem cache fixo), então a atualização aparece ao recarregar a página. Se alterar o `nginx/painel.conf`, recarregue o nginx: `docker compose -f docker-compose.yml -f docker-compose.prod.yml restart painel`.
 - `scripts/gerar_dados_dev.py` é SÓ para o banco de desenvolvimento e NUNCA deve rodar em produção. Ele tem uma trava: recusa qualquer `DATABASE_URL` que não aponte para localhost.
 - O painel depende do domínio definido em `DOMINIO` (veja "Deploy da API na VPS"); trocar de domínio não exige mudar nada no painel.
+
+## Faixas de ITGU
+
+O ITGU é classificado pela faixa da idade do lote (dias desde o alojamento): **conforto** dentro dos limites de conforto, **crítico** além dos limites críticos, **alerta** no meio. Um limite que não existe na literatura fica **vazio** (nulo): o painel não escreve nada sobre ele e a escala dos gráficos usa só os limites que existem (migração `db/005`; só o conforto máximo é obrigatório).
+
+Faixas de **poedeiras** (aplicadas por `scripts/aplicar_faixas_poedeiras.py`):
+
+| Idade (dias) | Conforto | Alerta | Crítico | Fonte |
+|---|---|---|---|---|
+| 0 a 7 (cria, 1ª semana) | 83,0 a 89,0 | fora do conforto | sem limite crítico | Andrade et al. (2019) |
+| 8 a 14 (cria, 2ª semana) | 77,0 a 81,0 | fora do conforto | sem limite crítico | Andrade et al. (2019) |
+| 15 a 42 | sem faixa (não há ITGU publicado; o painel mostra "sem faixa") | | | |
+| 43 a 1000 (recria e produção) | até 75,0 | 75,0 a 78,0 | acima de 78,0 | Tinôco (1998); Baêta e Souza (2010) |
+
+Os limites valem inclusive: 75,0 ainda é conforto e 78,0 ainda é alerta. Idades acima de 1000 dias ficam sem faixa.
+
+- `DATABASE_URL_API=... python scripts/aplicar_faixas_poedeiras.py` desativa (não apaga) as faixas `EXEMPLO...` e cria as de poedeiras. É idempotente (a faixa é identificada pelo nome; as que já existem não são alteradas) e funciona no banco local e no de produção. Se uma faixa nova se sobrepõe em idade a outra faixa ativa, não altera nada e avisa qual.
+- `scripts/gerar_dados_dev.py` (só dev) aplica as mesmas faixas e aloja o `esp01` com 100 dias e o `esp02` com 10 dias.
+
+Referências:
+- ANDRADE, R. R. et al. Engenharia Agrícola, v. 39, n. 1, p. 32-40, 2019.
+- JÁCOME, I. M. T. D. et al. RBEAA, v. 11, n. 5, p. 527-531, 2007 (cita Tinôco, 1998: ITGU até 75 é conforto para poedeiras).
+- BAÊTA, F. C.; SOUZA, C. F. Ambiência em edificações rurais: conforto animal. Viçosa: UFV, 2010.
 
 ## Previsão do ITGU (`/previsao`)
 

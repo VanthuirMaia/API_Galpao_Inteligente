@@ -18,6 +18,8 @@ from psycopg.types.json import Jsonb
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "ingestor"))
 sys.path.insert(0, str(RAIZ / "api"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from aplicar_faixas_poedeiras import aplicar_faixas  # noqa: E402
 from itgu import itgu_de_leitura  # noqa: E402
 from app.seguranca import hash_senha  # noqa: E402
 
@@ -25,13 +27,8 @@ DIAS = int(os.environ.get("DIAS", "7"))
 RECIFE = ZoneInfo("America/Recife")
 SENHA_LEITOR = "leitor-dev-12345"
 
-# ATENÇÃO: valores INVENTADOS, só para ver as cores do painel funcionando.
-# NÃO são valores técnicos. As faixas reais vêm do professor e são cadastradas pelo painel.
-FAIXAS_EXEMPLO = [
-    ("EXEMPLO - Semana 1", 0, 7, 70, 74, 79, 84),
-    ("EXEMPLO - Semana 2", 8, 14, 69, 73, 79, 85),
-    ("EXEMPLO - Semana 3", 15, 21, 68, 72, 80, 86),
-]
+# idade do lote de cada galpão no dev (dias): esp01 na faixa de recria/produção, esp02 na 2ª semana de cria
+IDADES_DEV = {"esp01": 100, "esp02": 10}
 
 # perfil de cada galpão: acréscimo de temperatura interna em relação à externa e ruído
 PERFIS = {"esp01": {"extra": 1.5}, "esp02": {"extra": 2.8}}
@@ -89,17 +86,12 @@ def gerar_leituras(conn, agora: datetime) -> int:
 
 
 def preparar_cadastros(conn, agora: datetime) -> None:
-    for nome, ini, fim, cmin, mmin, mmax, cmax in FAIXAS_EXEMPLO:
-        conn.execute(
-            "INSERT INTO galpao.faixas_itgu (nome, idade_inicio_dias, idade_fim_dias, critico_min, conforto_min, "
-            "conforto_max, critico_max) SELECT %s, %s, %s, %s, %s, %s, %s "
-            "WHERE NOT EXISTS (SELECT 1 FROM galpao.faixas_itgu WHERE nome = %s)",
-            (nome, ini, fim, cmin, mmin, mmax, cmax, nome),
-        )
+    aplicar_faixas(conn)  # as mesmas faixas de poedeiras de produção (scripts/aplicar_faixas_poedeiras.py)
     hoje = agora.astimezone(RECIFE).date()
-    conn.execute(
-        "UPDATE galpao.dispositivos SET data_alojamento = %s WHERE id = 'esp02'", (hoje - timedelta(days=20),)
-    )
+    for device_id, dias in IDADES_DEV.items():
+        conn.execute(
+            "UPDATE galpao.dispositivos SET data_alojamento = %s WHERE id = %s", (hoje - timedelta(days=dias), device_id)
+        )
     conn.execute(
         "INSERT INTO galpao.usuarios (email, nome, senha_hash, perfil) VALUES ('leitor@galpao.dev', 'Leitor de Teste', %s, 'leitor') "
         "ON CONFLICT (email) DO NOTHING",

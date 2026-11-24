@@ -1,6 +1,6 @@
 // Visão geral: um card por dispositivo, atualizado a cada 60 s.
 import { api } from "./api.js";
-import { CLASSIFICACAO, ambienteRotulo, dataHora, diasRotulo, el, haQuanto, hora, numero } from "./formato.js";
+import { CLASSIFICACAO, ambienteRotulo, dataHora, diasRotulo, el, haQuanto, hora, numero, textoConforto } from "./formato.js";
 import { montarLayout } from "./layout.js";
 import { exigirLogin } from "./sessao.js";
 
@@ -62,7 +62,7 @@ function linhaFaixa(situacao) {
     const f = situacao.faixa;
     const manual = situacao.origem_faixa === "manual" ? " (escolhida manualmente)" : "";
     partes.push(`Faixa: ${f.nome}${manual}`);
-    partes.push(`Conforto: ${numero(f.conforto_min, 1)} a ${numero(f.conforto_max, 1)}`);
+    partes.push(`Conforto: ${textoConforto(f, " a ")}`);
   } else {
     partes.push("Faixa: sem faixa definida");
   }

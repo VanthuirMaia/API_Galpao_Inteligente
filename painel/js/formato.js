@@ -80,12 +80,33 @@ export function deInputLocal(texto) {
   return Number.isNaN(data.getTime()) ? null : data;
 }
 
+/** O limite existe? A API manda null quando a faixa não tem aquele limite. */
+export function temLimite(valor) {
+  return valor !== null && valor !== undefined;
+}
+
 /** Mesma regra do servidor (app/classificacao.py), usada para estimar % de tempo nos gráficos. */
 export function classificar(itgu, faixa) {
   if (!faixa) return "sem_faixa";
-  if (itgu >= faixa.conforto_min && itgu <= faixa.conforto_max) return "conforto";
-  if (itgu < faixa.critico_min || itgu > faixa.critico_max) return "critico";
+  const { conforto_min: min, conforto_max: max, critico_min: cmin, critico_max: cmax } = faixa;
+  if ((!temLimite(min) || itgu >= min) && itgu <= max) return "conforto";
+  if ((temLimite(cmin) && itgu < cmin) || (temLimite(cmax) && itgu > cmax)) return "critico";
   return "alerta";
+}
+
+/** Faixa de conforto em texto: "83,0 – 89,0" ou, sem limite inferior, "até 75,0". */
+export function textoConforto(faixa, separador = " – ") {
+  const max = numero(faixa.conforto_max, 1);
+  return temLimite(faixa.conforto_min) ? `${numero(faixa.conforto_min, 1)}${separador}${max}` : `até ${max}`;
+}
+
+/** Início e fim de uma escala de gráfico, só com os limites que existem, mais uma folga (fração da amplitude). */
+export function limitesDaEscala(faixa, folga = 0.4) {
+  const limites = [faixa.critico_min, faixa.conforto_min, faixa.conforto_max, faixa.critico_max].filter(temLimite);
+  const min = Math.min(...limites);
+  const max = Math.max(...limites);
+  const margem = Math.max(max - min, 8) * folga; // amplitude mínima de 8 pontos de ITGU, para a escala não ficar apertada
+  return { min: min - margem, max: max + margem };
 }
 
 // ---------- diagnóstico ----------
