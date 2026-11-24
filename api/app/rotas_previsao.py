@@ -64,13 +64,15 @@ def previsao(device_id: str = Query(..., description="id do dispositivo, ex.: es
     previsto = round(float(prever(modelo, X)[0]), 2)
     faixa, _, _ = escolher_faixa(dispositivo, carregar_faixas_ativas(conn), hoje_recife())
     referencia = X.index[0]
+    itgu_atual = float(bruto["itgu"].iloc[-1])
     return {
         **base,
         "status": "ok",
-        "itgu_atual": float(bruto["itgu"].iloc[-1]),
+        "itgu_atual": itgu_atual,
         "itgu_previsto": previsto,
         "horizonte_min": meta["horizonte_min"],
         "classificacao": classificar(previsto, faixa),
+        "classificacao_atual": classificar(itgu_atual, faixa),
         "referencia_ts": referencia.to_pydatetime(),
         "previsto_para": (referencia + timedelta(minutes=meta["horizonte_min"])).to_pydatetime(),
         "modelo": meta["tipo"],

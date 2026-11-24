@@ -124,7 +124,7 @@ Notas:
 O painel mostra o ITGU previsto para daqui a 30 min. O modelo é treinado offline (pasta `ml/`) e a API só aplica o modelo salvo em `ml/modelo/`. As features são calculadas pelo **mesmo código** do treino (`ml/features.py`, copiado para a imagem da API em `/srv/ml`; o `docker-compose.yml` passa a pasta `ml/` como `additional_contexts`).
 
 - `GET /previsao?device_id=esp01` (mesmo JWT das outras rotas) devolve `status`:
-  - `ok`: `itgu_atual`, `itgu_previsto`, `horizonte_min`, `classificacao` (pela faixa vigente do dispositivo), `modelo`, `origem` (`sintetico` ou `real`), `mae_teste`, `gerado_em`;
+  - `ok`: `itgu_atual`, `itgu_previsto`, `horizonte_min`, `classificacao` do previsto e `classificacao_atual` do ITGU atual (pela faixa vigente do dispositivo; o card compara as duas), `modelo`, `origem` (`sintetico` ou `real`), `mae_teste`, `gerado_em`;
   - `dados_insuficientes`: faltam 65 min de leituras contínuas, a última leitura é antiga ou falta algum sensor que o modelo usa (`motivo` explica);
   - `modelo_indisponivel`: `ml/modelo/` está vazia.
 - Quando `origem = sintetico`, o painel mostra o selo "Modelo de teste (dados sintéticos)".

@@ -66,7 +66,8 @@ class PrevisaoOut(BaseModel):
     itgu_atual: float | None = None
     itgu_previsto: float | None = None
     horizonte_min: int | None = None
-    classificacao: Literal["conforto", "alerta", "critico", "sem_faixa"] | None = None
+    classificacao: Literal["conforto", "alerta", "critico", "sem_faixa"] | None = None  # do ITGU previsto
+    classificacao_atual: Literal["conforto", "alerta", "critico", "sem_faixa"] | None = None  # do itgu_atual
     referencia_ts: datetime | None = None  # início da última janela de 5 min usada
     previsto_para: datetime | None = None  # início da janela de 5 min prevista (referencia + horizonte)
     modelo: Literal["linear", "xgboost"] | None = None

@@ -107,6 +107,7 @@ def test_previsao_ok(client, h):
     assert j["itgu_previsto"] == pytest.approx(ITGU + 1, abs=0.01)
     assert j["horizonte_min"] == 30
     assert j["classificacao"] == "alerta"  # 78,5 está acima do conforto (75) e abaixo do crítico (80)
+    assert j["classificacao_atual"] == "alerta"  # 77,5 também: o atual é classificado pela mesma faixa
     assert (j["modelo"], j["origem"], j["mae_teste"]) == ("linear", "sintetico", 0.4)
     assert datetime.fromisoformat(j["previsto_para"]) - datetime.fromisoformat(j["referencia_ts"]) == timedelta(minutes=30)
     assert j["gerado_em"] and j["treinado_em"]
@@ -115,7 +116,8 @@ def test_previsao_ok(client, h):
 def test_sem_faixa(client, h, conn):
     conn.execute("UPDATE galpao.dispositivos SET data_alojamento = NULL WHERE id = 'esp01'")
     try:
-        assert client.get("/previsao?device_id=esp01", headers=h).json()["classificacao"] == "sem_faixa"
+        j = client.get("/previsao?device_id=esp01", headers=h).json()
+        assert (j["classificacao"], j["classificacao_atual"]) == ("sem_faixa", "sem_faixa")
     finally:
         conn.execute("UPDATE galpao.dispositivos SET data_alojamento = %s WHERE id = 'esp01'", (date.today() - timedelta(days=10),))
 

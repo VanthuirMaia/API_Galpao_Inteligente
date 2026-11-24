@@ -594,6 +594,26 @@ const TEXTO_PREVISAO = {
   sem_faixa: { pill: "Sem faixa", acao: "Defina a faixa do lote para classificar a previsão." },
 };
 const ROTULO_MODELO = { linear: "regressão linear", xgboost: "XGBoost" };
+const GRAVIDADE = { conforto: 0, alerta: 1, critico: 2 };
+
+/** Frase do card: compara a classificação atual com a prevista (continuar, voltar, sair, continuar fora). */
+function fraseDaPrevisao(atual, prevista) {
+  if (prevista === "sem_faixa") return TEXTO_PREVISAO.sem_faixa.acao;
+  if (!(atual in GRAVIDADE)) return TEXTO_PREVISAO[prevista].acao; // sem a classe atual (ex.: sem faixa): só descreve a previsão
+  if (prevista === "conforto") {
+    return atual === "conforto" ? "Deve continuar na faixa de conforto." : "Deve voltar à faixa de conforto.";
+  }
+  if (atual === "conforto") {
+    return prevista === "critico" ? "Deve sair do conforto e chegar a nível crítico. Aja agora." : "Deve sair da faixa de conforto. Fique atento.";
+  }
+  // já fora do conforto e continua fora
+  if (atual === prevista) {
+    return prevista === "critico" ? "Deve continuar em nível crítico. Aja agora." : "Deve continuar fora da faixa de conforto. Fique atento.";
+  }
+  return GRAVIDADE[prevista] > GRAVIDADE[atual]
+    ? "Deve piorar e chegar a nível crítico. Aja agora."
+    : "Deve melhorar, mas continuar fora da faixa de conforto.";
+}
 
 /** Preenche o card "ITGU previsto". `p` é a resposta de /previsao ou {status: "erro"}. */
 function mostrarPrevisao(p, d) {
@@ -634,7 +654,7 @@ function mostrarPrevisao(p, d) {
   campo("atual").textContent = numero(p.itgu_atual, 1);
   campo("faixa").textContent = faixa ? `${numero(faixa.conforto_min, 1)} – ${numero(faixa.conforto_max, 1)}` : "Sem faixa";
   campo("hora").textContent = horaMinuto(new Date(p.previsto_para).getTime());
-  campo("acao").textContent = texto.acao;
+  campo("acao").textContent = fraseDaPrevisao(p.classificacao_atual, classe);
   campo("nota").textContent =
     `Erro médio do modelo no teste: ± ${numero(p.mae_teste, 1)} ITGU · ${ROTULO_MODELO[p.modelo] || p.modelo} · treinado em ${dataHora(p.treinado_em)}`;
 }
