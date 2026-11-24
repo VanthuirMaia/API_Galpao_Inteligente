@@ -167,3 +167,7 @@ O painel mostra o ITGU previsto para daqui a 30 min. O modelo é treinado offlin
 Testes: `cd ml && uv run pytest` (paridade treino x API, formato do modelo) e `tests/api/test_previsao_integracao.py` (rota com Postgres, `DATABASE_URL_TEST`). A API precisa de `numpy`, `pandas` e `xgboost-cpu` (já em `api/requirements.txt`).
 
 Projeto desenvolvido no Espaço CRIA da ETEGEC com apoio da Fundação de Amparo à Ciência e Tecnologia do Estado de Pernambuco (FACEPE), processo ARC-0572-1.03/26.
+
+## Pendências
+
+- **`scripts/teste_painel.py`, trecho da "visão geral":** está desatualizado desde que o `index.html` virou o painel Nexar (`js/nexar.js`). O teste espera `article.card[data-id='esp01'] .itgu-valor`, que não existe mais, e para nessa etapa; por isso o arquivo não roda do começo ao fim. As seções de histórico, dispositivos e faixas continuam válidas. É preciso reescrever o trecho para o painel Nexar (cartões de temperatura, umidade e previsão, seletor de galpão `#dispositivo`). O `painel/js/visao_geral.js` não é carregado por nenhuma página e pode ser removido junto.
