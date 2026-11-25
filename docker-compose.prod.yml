@@ -1,28 +1,60 @@
-# Overlay de produção: o Postgres roda no host da VPS (localhost:5432).
+# Overlay de produção (VPS compartilhada): Postgres em container próprio e API/painel
+# publicados pelo Traefik v3 compartilhado, via rede Docker externa "proxy" (certresolver "le").
 # Uso: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Exige no .env: POSTGRES_PASSWORD, PG_SENHA_INGESTOR, PG_SENHA_API e DOMINIO (ver .env.prod.example).
 services:
-  ingestor:
-    # alcança o Postgres em localhost:5432 e o Mosquitto em 127.0.0.1:1883 (porta publicada no host)
-    network_mode: host
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: galpao
+      POSTGRES_DB: galpao
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina no .env}
+      # lidas pelo db/900_senhas_roles.sh na primeira inicialização do banco
+      PG_SENHA_INGESTOR: ${PG_SENHA_INGESTOR:?defina no .env}
+      PG_SENHA_API: ${PG_SENHA_API:?defina no .env}
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d:ro
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U galpao -d galpao"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
 
-  # API publicada pelo Traefik já existente na VPS (rede externa). Nomes com prefixo "galpao-"
+  ingestor:
+    environment:
+      MQTT_HOST: mosquitto
+      DATABASE_URL: postgresql://galpao_ingestor:${PG_SENHA_INGESTOR:?defina no .env}@postgres:5432/galpao
+    depends_on:
+      - postgres
+
+  # API publicada pelo Traefik compartilhado. Nomes com prefixo "galpao-"
   # para não colidir com os de outros projetos no mesmo Traefik.
   api:
-    extra_hosts:
-      - "host.docker.internal:host-gateway"  # alcança o Postgres do host
+    environment:
+      DATABASE_URL_API: postgresql://galpao_api:${PG_SENHA_API:?defina no .env}@postgres:5432/galpao
+      ROOT_PATH: /api
+    depends_on:
+      - postgres
     networks:
       - default
-      - traefik
+      - proxy
     labels:
       - "traefik.enable=true"
       # o container tem 2 redes: sem isto o Traefik pode escolher a errada
-      - "traefik.docker.network=${TRAEFIK_REDE:-gestto_gestto-network}"
+      - "traefik.docker.network=proxy"
       - "traefik.http.services.galpao-api.loadbalancer.server.port=8000"
 
       # API em /api (o prefixo é removido antes de chegar ao FastAPI)
-      - "traefik.http.routers.galpao-api.rule=Host(`${DOMINIO:?defina DOMINIO no .env}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.galpao-api.rule=Host(`${DOMINIO:?defina no .env}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.galpao-api.entrypoints=websecure"
-      - "traefik.http.routers.galpao-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.galpao-api.tls.certresolver=le"
       - "traefik.http.routers.galpao-api.priority=100"
       - "traefik.http.routers.galpao-api.middlewares=galpao-api-strip"
       - "traefik.http.middlewares.galpao-api-strip.stripprefix.prefixes=/api"
@@ -30,7 +62,7 @@ services:
       # login com limite de tentativas (por IP de origem); prioridade maior que a do router geral
       - "traefik.http.routers.galpao-login.rule=Host(`${DOMINIO}`) && Path(`/api/auth/login`)"
       - "traefik.http.routers.galpao-login.entrypoints=websecure"
-      - "traefik.http.routers.galpao-login.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.galpao-login.tls.certresolver=le"
       - "traefik.http.routers.galpao-login.priority=200"
       - "traefik.http.routers.galpao-login.middlewares=galpao-login-limite,galpao-api-strip"
       - "traefik.http.middlewares.galpao-login-limite.ratelimit.average=5"
@@ -41,17 +73,20 @@ services:
   painel:
     networks:
       - default
-      - traefik
+      - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=${TRAEFIK_REDE:-gestto_gestto-network}"
+      - "traefik.docker.network=proxy"
       - "traefik.http.services.galpao-painel.loadbalancer.server.port=80"
-      - "traefik.http.routers.galpao-painel.rule=Host(`${DOMINIO:?defina DOMINIO no .env}`)"
+      - "traefik.http.routers.galpao-painel.rule=Host(`${DOMINIO:?defina no .env}`)"
       - "traefik.http.routers.galpao-painel.entrypoints=websecure"
-      - "traefik.http.routers.galpao-painel.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.galpao-painel.tls.certresolver=le"
       - "traefik.http.routers.galpao-painel.priority=10"
 
 networks:
-  traefik:
-    name: ${TRAEFIK_REDE:-gestto_gestto-network}
+  proxy:
+    name: proxy
     external: true
+
+volumes:
+  postgres_data:

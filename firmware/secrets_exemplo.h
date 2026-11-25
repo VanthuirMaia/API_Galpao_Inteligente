@@ -7,6 +7,6 @@
 #define WIFI_PASS "senha-da-rede-wifi"
 
 // Servidor MQTT (Mosquitto na VPS): IP ou domínio do broker
-#define MQTT_BROKER "192.0.2.10"
+#define MQTT_BROKER "mqtt.etenexus.tech"
 // Senha do usuário MQTT deste ESP (o usuário é o DEVICE_ID, ex.: esp01); criada com scripts/criar_usuario_mqtt.sh
 #define MQTT_PASS "senha-mqtt-do-esp"

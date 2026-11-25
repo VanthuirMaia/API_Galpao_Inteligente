@@ -54,7 +54,7 @@ Rede Wi-Fi, senha MQTT e endereço do broker **não ficam no código**: ficam em
 | Definição | O que é |
 |---|---|
 | `WIFI_SSID`, `WIFI_PASS` | rede Wi-Fi do galpão (2,4 GHz) |
-| `MQTT_BROKER` | IP ou domínio do Mosquitto na VPS |
+| `MQTT_BROKER` | domínio do Mosquitto na VPS (`mqtt.etenexus.tech`, porta 1883) |
 | `MQTT_PASS` | senha do usuário MQTT deste ESP, criada com `scripts/criar_usuario_mqtt.sh <device_id> <senha>` |
 
 O usuário MQTT e o `client id` são o `DEVICE_ID` (`const char* DEVICE_ID = "esp01"` no sketch). Cada ESP precisa de um `DEVICE_ID` diferente, cadastrado no painel (Dispositivos) e com usuário no Mosquitto.
